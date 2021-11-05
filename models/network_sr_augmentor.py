@@ -5,10 +5,8 @@ Author: Varun Jois
 '''
 
 import functools
-import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from models.network_rrdbnet import initialize_weights, make_layer, RRDB
+from models.network_rrdbnet import make_layer, RRDB
 
 
 class SRAUG(nn.Module):
