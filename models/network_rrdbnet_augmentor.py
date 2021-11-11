@@ -9,7 +9,7 @@ import torch.nn as nn
 from models.network_rrdbnet import make_layer, RRDB
 
 
-class SRAUG(nn.Module):
+class RRDBNET_AUG(nn.Module):
     def __init__(self, in_nc=3, out_nc=3, nf=64, gc=32, nb1=1, nb2=1, nb3=10):
         '''
         The augmentor used for creating augmented data.
@@ -23,7 +23,7 @@ class SRAUG(nn.Module):
         nb2 : The number of RRDB blocks before the second maxpool downsampling.
         nb3 : The number of RRDB blocks before the after the last maxpool downsampling.
         '''
-        super(SRAUG, self).__init__()
+        super(RRDBNET_AUG, self).__init__()
         RRDB_block = functools.partial(RRDB, nf=nf, gc=gc)
 
         self.conv_first = nn.Conv2d(in_nc, nf, 3, 1, 1, bias=True)

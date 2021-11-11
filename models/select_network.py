@@ -385,3 +385,35 @@ def init_weights(net, init_type='xavier_uniform', init_bn_type='uniform', gain=1
         net.apply(fn)
     else:
         print('Pass this initialization! Initialization was done during network defination!')
+
+
+# --------------------------------------------
+# Augmentor, netA, A
+# --------------------------------------------
+def define_A(opt):
+    opt_net = opt['netA']
+    net_type = opt_net['net_type']
+
+    # ----------------------------------------
+    # discriminator_vgg_96
+    # ----------------------------------------
+    if net_type == 'rrdbnet':
+        from models.network_rrdbnet_augmentor import RRDBNET_AUG as net
+        netA = net(in_nc=opt_net['in_nc'],
+                   out_nc=opt_net['out_nc'],
+                   nf=opt_net['nf'],
+                   gc=opt_net['gc'],
+                   nb1=opt_net['nb1'],
+                   nb2=opt_net['nb2'],
+                   nb3=opt_net['nb3'])
+
+    # ----------------------------------------
+    # initialize weights
+    # ----------------------------------------
+    if opt['is_train']:
+        init_weights(netA,
+                     init_type=opt_net['init_type'],
+                     init_bn_type=opt_net['init_bn_type'],
+                     gain=opt_net['init_gain'])
+
+    return netA
