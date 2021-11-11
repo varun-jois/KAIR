@@ -12,6 +12,9 @@ def define_Model(opt):
     if model == 'plain':
         from models.model_plain import ModelPlain as M
 
+    elif model == 'plain_aug':  # use automatic data augmentation
+        from models.model_plain_aug import ModelPlainAug as M
+
     elif model == 'plain2':  # two inputs: L, C
         from models.model_plain2 import ModelPlain2 as M
 
