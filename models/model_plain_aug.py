@@ -4,7 +4,7 @@ import torch.nn as nn
 from torch.optim import lr_scheduler
 from torch.optim import Adam
 
-from models.select_network import define_G
+from models.select_network import define_G, define_A
 from models.model_base import ModelBase
 from models.loss import CharbonnierLoss
 from models.loss_ssim import SSIMLoss
@@ -23,6 +23,8 @@ class ModelPlainAug(ModelBase):
         self.opt_train = self.opt['train']    # training option
         self.netG = define_G(opt)
         self.netG = self.model_to_device(self.netG)
+        self.netA = define_A(opt)
+        self.netA = self.model_to_device(self.netA)
         if self.opt_train['E_decay'] > 0:
             self.netE = define_G(opt).to(self.device).eval()
 
@@ -39,6 +41,7 @@ class ModelPlainAug(ModelBase):
     def init_train(self):
         self.load()                           # load model
         self.netG.train()                     # set training mode,for BN
+        self.netA.train()
         self.define_loss()                    # define loss
         self.define_optimizer()               # define optimizer
         self.load_optimizers()                # load optimizer
@@ -53,6 +56,12 @@ class ModelPlainAug(ModelBase):
         if load_path_G is not None:
             print('Loading model for G [{:s}] ...'.format(load_path_G))
             self.load_network(load_path_G, self.netG, strict=self.opt_train['G_param_strict'], param_key='params')
+
+        load_path_A = self.opt['path']['pretrained_netA']
+        if load_path_A is not None:
+            print('Loading model for A [{:s}] ...'.format(load_path_A))
+            self.load_network(load_path_A, self.netA, strict=self.opt_train['A_param_strict'], param_key='params')
+
         load_path_E = self.opt['path']['pretrained_netE']
         if self.opt_train['E_decay'] > 0:
             if load_path_E is not None:

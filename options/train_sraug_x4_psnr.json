@@ -10,20 +10,19 @@
   , "path": {
     "root": "superresolution"      // "denoising" | "superresolution"
     , "pretrained_netG": null      // path of pretrained model
+    , "pretrained_netA": null      // path of pretrained model
     , "pretrained_netE": null      // path of pretrained model
   }
 
   , "datasets": {
     "train": {
       "name": "train_dataset"           // fixed
-      , "dataset_type": "blindsr"       // "dncnn" | "dnpatch" | "fdncnn" | "ffdnet" | "sr" | "srmd" | "dpsr" | "plain" | "plainpatch"
+      , "dataset_type": "sr"       // "dncnn" | "dnpatch" | "fdncnn" | "ffdnet" | "sr" | "srmd" | "dpsr" | "plain" | "plainpatch"
       , "dataroot_H": "trainsets/trainH"// path of H training dataset
       , "dataroot_L": null              // path of L training dataset
 
-      , "degradation_type": "bsrgan"    // "bsrgan" | "bsrgan_plus"
       , "H_size": 320                   // patch_size 256 | 288 | 320
-      , "shuffle_prob": 0.1             //
-      , "lq_patchsize": 72
+      , "shuffle_prob": 0.1
       , "use_sharp": false
 
       , "dataloader_shuffle": true
