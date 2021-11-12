@@ -177,11 +177,6 @@ def main(json_path='options/train_msrresnet_psnr.json'):
             current_step += 1
 
             # -------------------------------
-            # 1) update learning rate
-            # -------------------------------
-            model.update_learning_rate(current_step)
-
-            # -------------------------------
             # 2) feed patch pairs
             # -------------------------------
             model.feed_data(train_data)
@@ -190,6 +185,12 @@ def main(json_path='options/train_msrresnet_psnr.json'):
             # 3) optimize parameters
             # -------------------------------
             model.optimize_parameters(current_step)
+
+            # -------------------------------
+            # 1) update learning rate
+            # -------------------------------
+            model.update_learning_rate(current_step)
+
 
             # -------------------------------
             # 4) training information
