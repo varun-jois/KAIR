@@ -209,7 +209,7 @@ class ModelPlainAug(ModelBase):
 
         # get augmentor loss and backprop
         A_loss = self.A_lossfn(self.E, self.E_A, self.H)
-        A_loss.backward()
+        A_loss.backward(retain_graph=True)
         self.A_optimizer.step()
 
         # now optimize the generator
