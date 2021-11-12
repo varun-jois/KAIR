@@ -18,7 +18,7 @@
     "train": {
       "name": "train_dataset"           // fixed
       , "dataset_type": "sr"       // "dncnn" | "dnpatch" | "fdncnn" | "ffdnet" | "sr" | "srmd" | "dpsr" | "plain" | "plainpatch"
-      , "dataroot_H": "/sr/datasets/DIV2K/DIV2K_train_HR"  // path of H training dataset trainsets/trainH
+      , "dataroot_H": "~/sr/datasets/DIV2K/DIV2K_train_HR"  // path of H training dataset trainsets/trainH
       , "dataroot_L": null              // path of L training dataset
 
       , "H_size": 320                   // patch_size 256 | 288 | 320
@@ -37,7 +37,7 @@
       , "shuffle_prob": 0.1             //
       , "use_sharp": false
 
-      , "dataroot_H": "/sr/datasets/DIV2K/DIV2K_valid_HR"   // path of H testing dataset
+      , "dataroot_H": "~/sr/datasets/DIV2K/DIV2K_valid_HR"   // path of H testing dataset
       , "dataroot_L": null              // path of L testing dataset
     }
   }
