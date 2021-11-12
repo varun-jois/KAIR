@@ -69,6 +69,13 @@ def main(json_path='options/train_msrresnet_psnr.json'):
     init_iter_optimizerG, init_path_optimizerG = option.find_last_checkpoint(opt['path']['models'], net_type='optimizerG')
     opt['path']['pretrained_optimizerG'] = init_path_optimizerG
     current_step = max(init_iter_G, init_iter_E, init_iter_optimizerG)
+    
+    # for the augmentor and its optimizer
+    if opt['task'] == 'sraug_x4_psnr':
+        init_iter_A, init_path_A = option.find_last_checkpoint(opt['path']['models'], net_type='A')
+        opt['path']['pretrained_netA'] = init_path_A
+        init_iter_optimizerA, init_path_optimizerA = option.find_last_checkpoint(opt['path']['models'], net_type='optimizerA')
+        opt['path']['pretrained_optimizerA'] = init_path_optimizerA
 
     border = opt['scale']
     # --<--<--<--<--<--<--<--<--<--<--<--<--<-

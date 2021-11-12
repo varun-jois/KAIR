@@ -83,6 +83,11 @@ class ModelPlainAug(ModelBase):
             print('Loading optimizerG [{:s}] ...'.format(load_path_optimizerG))
             self.load_optimizer(load_path_optimizerG, self.G_optimizer)
 
+        load_path_optimizerA = self.opt['path']['pretrained_optimizerA']
+        if load_path_optimizerA is not None and self.opt_train['A_optimizer_reuse']:
+            print('Loading optimizerA [{:s}] ...'.format(load_path_optimizerA))
+            self.load_optimizer(load_path_optimizerA, self.A_optimizer)
+
     # ----------------------------------------
     # save model / optimizer(optional)
     # ----------------------------------------
