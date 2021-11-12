@@ -230,6 +230,15 @@ def main(json_path='options/train_msrresnet_psnr.json'):
                     save_img_path = os.path.join(img_dir, '{:s}_{:d}.png'.format(img_name, current_step))
                     util.imsave(E_img, save_img_path)
 
+                    # save the low resolution image and augmentor result
+                    if 'L_A' in visuals:
+                        L_img = util.tensor2uint(visuals['L'])
+                        save_img_path = os.path.join(img_dir, '{:s}_L_{:d}.png'.format(img_name, current_step))
+                        util.imsave(L_img, save_img_path)
+                        L_A_img = util.tensor2uint(visuals['L_A'])
+                        save_img_path = os.path.join(img_dir, '{:s}_L_A_{:d}.png'.format(img_name, current_step))
+                        util.imsave(L_A_img, save_img_path)
+
                     # -----------------------
                     # calculate PSNR
                     # -----------------------

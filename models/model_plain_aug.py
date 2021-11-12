@@ -25,6 +25,8 @@ class ModelPlainAug(ModelBase):
         self.netG = self.model_to_device(self.netG)
         self.netA = define_A(opt)
         self.netA = self.model_to_device(self.netA)
+        self.hard_ratio = 1
+        self.augmentation_wt = 1
         if self.opt_train['E_decay'] > 0:
             self.netE = define_G(opt).to(self.device).eval()
 
@@ -86,10 +88,13 @@ class ModelPlainAug(ModelBase):
     # ----------------------------------------
     def save(self, iter_label):
         self.save_network(self.save_dir, self.netG, 'G', iter_label)
+        self.save_network(self.save_dir, self.netA, 'A', iter_label)
         if self.opt_train['E_decay'] > 0:
             self.save_network(self.save_dir, self.netE, 'E', iter_label)
         if self.opt_train['G_optimizer_reuse']:
             self.save_optimizer(self.save_dir, self.G_optimizer, 'optimizerG', iter_label)
+        if self.opt_train['A_optimizer_reuse']:
+            self.save_optimizer(self.save_dir, self.A_optimizer, 'optimizerA', iter_label)
 
     # ----------------------------------------
     # define loss
@@ -110,6 +115,15 @@ class ModelPlainAug(ModelBase):
             raise NotImplementedError('Loss type [{:s}] is not found.'.format(G_lossfn_type))
         self.G_lossfn_weight = self.opt_train['G_lossfn_weight']
 
+        # augmentor loss
+        def augmentor_loss(E, E_A, H):
+            loss_E = self.G_lossfn(E, H)
+            loss_E_A = self.G_lossfn(E_A, H)
+            aug_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E))
+            loss = loss_E_A + self.augmentation_wt * aug_loss
+            return loss
+        self.A_lossfn = augmentor_loss
+
     # ----------------------------------------
     # define optimizer
     # ----------------------------------------
@@ -122,6 +136,15 @@ class ModelPlainAug(ModelBase):
                 print('Params [{:s}] will not optimize.'.format(k))
         self.G_optimizer = Adam(G_optim_params, lr=self.opt_train['G_optimizer_lr'], weight_decay=0)
 
+        # optimizer for the augmentor
+        A_optim_params = []
+        for k, v in self.netA.named_parameters():
+            if v.requires_grad:
+                A_optim_params.append(v)
+            else:
+                print('Params [{:s}] will not optimize.'.format(k))
+        self.A_optimizer = Adam(A_optim_params, lr=self.opt_train['A_optimizer_lr'], weight_decay=0)
+
     # ----------------------------------------
     # define scheduler, only "MultiStepLR"
     # ----------------------------------------
@@ -129,6 +152,11 @@ class ModelPlainAug(ModelBase):
         self.schedulers.append(lr_scheduler.MultiStepLR(self.G_optimizer,
                                                         self.opt_train['G_scheduler_milestones'],
                                                         self.opt_train['G_scheduler_gamma']
+                                                        ))
+        # scheduler for the augmentor
+        self.schedulers.append(lr_scheduler.MultiStepLR(self.A_optimizer,
+                                                        self.opt_train['A_scheduler_milestones'],
+                                                        self.opt_train['A_scheduler_gamma']
                                                         ))
     """
     # ----------------------------------------
@@ -152,12 +180,32 @@ class ModelPlainAug(ModelBase):
         self.E = self.netG(self.L)
 
     # ----------------------------------------
+    # feed L to netA
+    # ----------------------------------------
+    def netA_forward(self):
+        self.L_A = self.netA(self.H)
+
+    # ----------------------------------------
     # update parameters and get loss
     # ----------------------------------------
     def optimize_parameters(self, current_step):
+        self.A_optimizer.zero_grad()
+        self.L_A = self.netA(self.H)
+        self.E = self.netG(self.L)
+        self.E_A = self.netG(self.L_A)
+
+        # update hard_ratio
+        if current_step % 200_000 == 0:
+            self.hard_ratio += 1
+
+        # get augmentor loss and backprop
+        A_loss = self.A_lossfn(self.E, self.E_A, self.H)
+        A_loss.backward()
+        self.A_optimizer.step()
+
+        # now optimize the generator
         self.G_optimizer.zero_grad()
-        self.netG_forward()
-        G_loss = self.G_lossfn_weight * self.G_lossfn(self.E, self.H)
+        G_loss = self.G_lossfn(self.E, self.H) + self.G_lossfn(self.E_A, self.H)
         G_loss.backward()
 
         # ------------------------------------
@@ -182,6 +230,8 @@ class ModelPlainAug(ModelBase):
 
         # self.log_dict['G_loss'] = G_loss.item()/self.E.size()[0]  # if `reduction='sum'`
         self.log_dict['G_loss'] = G_loss.item()
+        self.log_dict['A_loss'] = A_loss.item()
+        self.log_dict['hard_ratio'] = self.hard_ratio
 
         if self.opt_train['E_decay'] > 0:
             self.update_E(self.opt_train['E_decay'])
@@ -194,6 +244,11 @@ class ModelPlainAug(ModelBase):
         with torch.no_grad():
             self.netG_forward()
         self.netG.train()
+        
+        self.netA.eval()
+        with torch.no_grad():
+            self.netA_forward()
+        self.netA.train()
 
     # ----------------------------------------
     # test / inference x8
@@ -217,6 +272,7 @@ class ModelPlainAug(ModelBase):
         out_dict = OrderedDict()
         out_dict['L'] = self.L.detach()[0].float().cpu()
         out_dict['E'] = self.E.detach()[0].float().cpu()
+        out_dict['L_A'] = self.L_A.detach()[0].float().cpu()
         if need_H:
             out_dict['H'] = self.H.detach()[0].float().cpu()
         return out_dict

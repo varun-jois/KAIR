@@ -79,19 +79,26 @@
     , "init_gain": 0.2
   }
   , "train": {
-    "G_lossfn_type": "l1"               // "l1" preferred | "l2sum" | "l2" | "ssim"
+      "G_lossfn_type": "l1"             // "l1" preferred | "l2sum" | "l2" | "ssim"
     , "G_lossfn_weight": 1.0            // default
 
     , "E_decay": 0.999                  // Exponential Moving Average for netG: set 0 to disable; default setting 0.999
 
     , "G_optimizer_type": "adam"        // fixed, adam is enough
     , "G_optimizer_lr": 1e-4            // learning rate
+    , "A_optimizer_type": "adam"        // fixed, adam is enough
+    , "A_optimizer_lr": 1e-4            // learning rate
     , "G_optimizer_clipgrad": null      // unused
     , "G_optimizer_reuse": true
+    , "A_optimizer_reuse": true
 
     , "G_scheduler_type": "MultiStepLR" // "MultiStepLR" is enough
     , "G_scheduler_milestones": [200000, 400000, 600000, 800000, 1000000, 2000000]
     , "G_scheduler_gamma": 0.5
+
+    , "A_scheduler_type": "MultiStepLR" // "MultiStepLR" is enough
+    , "A_scheduler_milestones": [200000, 400000, 600000, 800000, 1000000, 2000000]
+    , "A_scheduler_gamma": 0.5
 
     , "G_regularizer_orthstep": null    // unused
     , "G_regularizer_clipstep": null    //
@@ -99,8 +106,11 @@
     , "G_param_strict": true
     , "E_param_strict": true
 
-    , "checkpoint_test": 500000000      // skip testing
+    , "checkpoint_test": 5000           // skip testing
     , "checkpoint_save": 5000           // for saving model
     , "checkpoint_print": 200           // for print
+    , "hard_ratio_start": 2             // The starting value of the hard ratio
+    , "hard_ratio_end": 20              // The final value of the hard ratio
+    , "manual_seed": 1
   }
 }
