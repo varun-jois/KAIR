@@ -215,7 +215,7 @@ class ModelPlainAug(ModelBase):
         # now optimize the generator
         self.G_optimizer.zero_grad()
         G_loss = self.G_lossfn(self.E, self.H) + self.G_lossfn(self.E_A, self.H)
-        G_loss.backward()
+        G_loss.backward(retain_graph=True)
 
         # ------------------------------------
         # clip_grad
