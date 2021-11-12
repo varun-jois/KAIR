@@ -12,6 +12,10 @@ from models.loss_ssim import SSIMLoss
 from utils.utils_model import test_mode
 from utils.utils_regularizers import regularizer_orth, regularizer_clip
 
+"""
+Author: Varun Jois
+"""
+
 
 class ModelPlainAug(ModelBase):
     """Train with pixel loss"""
