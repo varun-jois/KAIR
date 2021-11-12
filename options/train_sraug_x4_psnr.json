@@ -27,7 +27,7 @@
 
       , "dataloader_shuffle": true
       , "dataloader_num_workers": 8     // 8 | 32 | 64
-      , "dataloader_batch_size": 4      // batch size for all GPUs, 1 | 16 | 32 | 48 | 64 | 128
+      , "dataloader_batch_size": 2      // batch size for all GPUs, 1 | 16 | 32 | 48 | 64 | 128
     }
     , "test": {
       "name": "test_dataset"            // fixed
