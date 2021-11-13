@@ -198,6 +198,7 @@ class ModelPlainAug(ModelBase):
     # update parameters and get loss
     # ----------------------------------------
     def optimize_parameters(self, current_step):
+        torch.autograd.set_detect_anomaly(True)
         self.A_optimizer.zero_grad()
         self.L_A = self.netA(self.H)
         self.E = self.netG(self.L)
@@ -207,15 +208,24 @@ class ModelPlainAug(ModelBase):
         if current_step % 200_000 == 0:
             self.hard_ratio += 1
 
-        # get augmentor loss and backprop
-        A_loss = self.A_lossfn(self.E, self.E_A, self.H)
+        # calculate individual losses
+        loss_E = self.G_lossfn(self.E, self.H)
+        loss_E_A = self.G_lossfn(self.E_A, self.H)
+
+        # augmentor loss
+        A_loss = loss_E_A + self.augmentation_wt * torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E))
         A_loss.backward(retain_graph=True)
         self.A_optimizer.step()
 
+        # get augmentor loss and backprop
+        # A_loss = self.A_lossfn(self.E, self.E_A, self.H)
+        # A_loss.backward(retain_graph=True)
+        # self.A_optimizer.step()
+
         # now optimize the generator
         self.G_optimizer.zero_grad()
-        G_loss = self.G_lossfn(self.E, self.H) + self.G_lossfn(self.E_A, self.H)
-        G_loss.backward(retain_graph=True)
+        G_loss = loss_E + loss_E_A.detach()
+        G_loss.backward()
 
         # ------------------------------------
         # clip_grad
