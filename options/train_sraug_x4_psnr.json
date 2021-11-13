@@ -18,16 +18,16 @@
     "train": {
       "name": "train_dataset"           // fixed
       , "dataset_type": "sr"       // "dncnn" | "dnpatch" | "fdncnn" | "ffdnet" | "sr" | "srmd" | "dpsr" | "plain" | "plainpatch"
-      , "dataroot_H": "trainsets/trainH"  //"~/sr/datasets/DIV2K/DIV2K_train_HR"  // path of H training dataset trainsets/trainH
+      , "dataroot_H": "~/sr/datasets/DIV2K/DIV2K_train_HR"  //"~/sr/datasets/DIV2K/DIV2K_train_HR"  // path of H training dataset trainsets/trainH
       , "dataroot_L": null              // path of L training dataset
 
-      , "H_size": 40                   // patch_size 256 | 288 | 320
+      , "H_size": 320                   // patch_size 256 | 288 | 320
       , "shuffle_prob": 0.1
       , "use_sharp": false
 
       , "dataloader_shuffle": true
       , "dataloader_num_workers": 8     // 8 | 32 | 64
-      , "dataloader_batch_size": 1      // batch size for all GPUs, 1 | 16 | 32 | 48 | 64 | 128
+      , "dataloader_batch_size": 2      // batch size for all GPUs, 1 | 16 | 32 | 48 | 64 | 128
     }
     , "test": {
       "name": "test_dataset"            // fixed
@@ -37,7 +37,7 @@
       , "shuffle_prob": 0.1             //
       , "use_sharp": false
 
-      , "dataroot_H": "testsets/set5" //"~/sr/datasets/DIV2K/DIV2K_valid_HR"   // path of H testing dataset
+      , "dataroot_H": "~/sr/datasets/DIV2K/DIV2K_valid_HR" //"~/sr/datasets/DIV2K/DIV2K_valid_HR"   // path of H testing dataset
       , "dataroot_L": null              // path of L testing dataset
     }
   }
@@ -104,9 +104,9 @@
     , "G_param_strict": true
     , "E_param_strict": true
 
-    , "checkpoint_test": 2           // skip testing  they used 5000
-    , "checkpoint_save": 2           // for saving model 5000
-    , "checkpoint_print": 2           // for print they used 200
+    , "checkpoint_test": 10           // skip testing  they used 5000
+    , "checkpoint_save": 10           // for saving model 5000
+    , "checkpoint_print": 10           // for print they used 200
     , "hard_ratio_start": 2             // The starting value of the hard ratio
     , "hard_ratio_end": 20              // The final value of the hard ratio
     , "manual_seed": 1
