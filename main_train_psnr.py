@@ -173,7 +173,7 @@ def main(json_path='options/train_msrresnet_psnr.json'):
     # ----------------------------------------
     '''
 
-    for epoch in range(1):  # keep running
+    for epoch in range(1000):  # keep running
         for i, train_data in enumerate(train_loader):
 
             current_step += 1
@@ -274,3 +274,4 @@ def main(json_path='options/train_msrresnet_psnr.json'):
 
 if __name__ == '__main__':
     main()
+    print('training complete')
