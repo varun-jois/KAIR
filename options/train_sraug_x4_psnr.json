@@ -21,7 +21,7 @@
       , "dataroot_H": "~/sr/datasets/DIV2K/DIV2K_train_HR"  //"~/sr/datasets/DIV2K/DIV2K_train_HR"  // path of H training dataset trainsets/trainH
       , "dataroot_L": null              // path of L training dataset
 
-      , "H_size": 320                   // patch_size 256 | 288 | 320
+      , "H_size": 240                   // patch_size 256 | 288 | 320
       , "shuffle_prob": 0.1
       , "use_sharp": false
 
