@@ -220,7 +220,6 @@ def main(json_path='options/train_msrresnet_psnr.json'):
                 idx = 0
 
                 for test_data in test_loader:
-                    idx += 1
                     image_name_ext = os.path.basename(test_data['L_path'][0])
                     img_name, ext = os.path.splitext(image_name_ext)
 
@@ -228,7 +227,16 @@ def main(json_path='options/train_msrresnet_psnr.json'):
                     util.mkdir(img_dir)
 
                     model.feed_data(test_data)
-                    model.test()
+
+                    # adding out of memory handler
+                    oom = False
+                    try:
+                        model.test()
+                    except RuntimeError:  # Out of memory
+                        oom = True
+                    if oom:
+                        continue
+                    idx += 1
 
                     visuals = model.current_visuals()
                     E_img = util.tensor2uint(visuals['E'])
@@ -258,10 +266,11 @@ def main(json_path='options/train_msrresnet_psnr.json'):
 
                     avg_psnr += current_psnr
 
-                avg_psnr = avg_psnr / idx
+                avg_psnr = avg_psnr / idx if idx > 0 else 0
 
                 # testing log
                 logger.info('<epoch:{:3d}, iter:{:8,d}, Average PSNR : {:<.2f}dB\n'.format(epoch, current_step, avg_psnr))
+
 
 if __name__ == '__main__':
     main()
