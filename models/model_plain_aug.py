@@ -264,10 +264,10 @@ class ModelPlainAug(ModelBase):
             self.netG_forward()
         self.netG.train()
         
-        self.netA.eval()
-        with torch.no_grad():
-            self.netA_forward()
-        self.netA.train()
+        # self.netA.eval()
+        # with torch.no_grad():
+        #     self.netA_forward()
+        # self.netA.train()
 
     # ----------------------------------------
     # test / inference x8
@@ -291,7 +291,7 @@ class ModelPlainAug(ModelBase):
         out_dict = OrderedDict()
         out_dict['L'] = self.L.detach()[0].float().cpu()
         out_dict['E'] = self.E.detach()[0].float().cpu()
-        out_dict['L_A'] = self.L_A.detach()[0].float().cpu()
+        # out_dict['L_A'] = self.L_A.detach()[0].float().cpu()
         if need_H:
             out_dict['H'] = self.H.detach()[0].float().cpu()
         return out_dict
