@@ -56,5 +56,4 @@ class RRDBNET_AUG(nn.Module):
         fea = self.lrelu(fea + body)
 
         out = self.conv_last(fea)
-
         return out

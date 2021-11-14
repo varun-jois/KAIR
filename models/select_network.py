@@ -407,6 +407,11 @@ def define_A(opt):
                    nb2=opt_net['nb2'],
                    nb3=opt_net['nb3'])
 
+    elif net_type == 'simple':
+        from models.network_simple_augmentor import Simple_AUG as net
+        netA = net(in_nc=opt_net['in_nc'],
+                   out_nc=opt_net['out_nc'])
+
     # ----------------------------------------
     # initialize weights
     # ----------------------------------------

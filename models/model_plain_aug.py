@@ -198,7 +198,7 @@ class ModelPlainAug(ModelBase):
     # update parameters and get loss
     # ----------------------------------------
     def optimize_parameters(self, current_step):
-        torch.autograd.set_detect_anomaly(True)
+        # torch.autograd.set_detect_anomaly(True)
         self.A_optimizer.zero_grad()
         self.L_A = self.netA(self.H)
         self.E = self.netG(self.L)
@@ -217,15 +217,12 @@ class ModelPlainAug(ModelBase):
         A_loss.backward(retain_graph=True)
         self.A_optimizer.step()
 
-        # get augmentor loss and backprop
-        # A_loss = self.A_lossfn(self.E, self.E_A, self.H)
-        # A_loss.backward(retain_graph=True)
-        # self.A_optimizer.step()
-
-        # now optimize the generator
+        # optimize the generator (like this otherwise grads will be calculated for the Augmentor giving an error)
         self.G_optimizer.zero_grad()
-        G_loss = loss_E + loss_E_A.detach()
+        G_loss = loss_E + self.G_lossfn(self.netG(self.L_A.detach()), self.H)
         G_loss.backward()
+        # print(f'A after G back, should be unchanged: {self.netA.module.conv_last.weight[0][0][0].grad}')
+        # print(f'G after G back, should be changed: {self.netG.module.conv_last.weight[0][0][0].grad}')
 
         # ------------------------------------
         # clip_grad
