@@ -29,7 +29,7 @@ class ModelPlainAug(ModelBase):
         self.netG = self.model_to_device(self.netG)
         self.netA = define_A(opt)
         self.netA = self.model_to_device(self.netA)
-        self.hard_ratio = 2
+        self.hard_ratio = 10
         self.augmentation_wt = 1
         if self.opt_train['E_decay'] > 0:
             self.netE = define_G(opt).to(self.device).eval()
@@ -205,8 +205,8 @@ class ModelPlainAug(ModelBase):
         self.E_A = self.netG(self.L_A)
 
         # update hard_ratio
-        if current_step % 10_000 == 0:
-            self.hard_ratio += 1
+        if current_step % 2_000 == 0:  # 200 steps is 1 epoch for div2k train and batch size of 4
+            self.hard_ratio *= 2
 
         # calculate individual losses
         loss_E = self.G_lossfn(self.E, self.H)
