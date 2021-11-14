@@ -22,9 +22,8 @@ aug.load_state_dict(state_dict)
 
 # get an image
 paths = util.get_image_paths('/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR')
-index = range(801, 811)
 for i in range(10):
-    H_path = paths[index]
+    H_path = paths[i]
     img = util.imread_uint(H_path, 3)  # or manually set path   '/home/varun/PhD/super_resolution/vrj_data/div2k_0112.png'
     img = util.modcrop(img, 4)
     img_H = util.uint2single(img)
