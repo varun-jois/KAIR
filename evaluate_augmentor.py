@@ -34,8 +34,14 @@ for i in range(10):
 
     # downsample with augmentor
     imgt = util.uint2tensor4(img)
-    with torch.no_grad():
-        img_L_A = aug(imgt)
+    oom = False
+    try:
+        with torch.no_grad():
+            img_L_A = aug(imgt)
+    except RuntimeError:  # Out of memory
+        oom = True
+    if oom:
+        continue
 
     # convert back to uint and save
     img_L = util.single2uint(img_L)
@@ -50,6 +56,7 @@ for i in range(10):
     ax[0].set_xlabel('Bicubic')
     ax[1].set_xlabel('Augmentor')
     fig.savefig(f'aug_images/{i}.png', bbox_inches='tight')
+    print(f'Saved image {i}')
 
 # calculate psnr
 # psnr = util.calculate_psnr(img_L, img_L_A)
