@@ -16,7 +16,7 @@ import utils.utils_image as util
 
 # load the model
 aug = RRDBNET_AUG()
-state_dict = torch.load('superresolution/sraug_x4_psnr/models/30000_A.pth')
+state_dict = torch.load('superresolution/sraug_x4_psnr/models/35000_A.pth')
 aug.load_state_dict(state_dict)
 
 
