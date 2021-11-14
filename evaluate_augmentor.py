@@ -21,7 +21,7 @@ aug.load_state_dict(state_dict)
 
 
 # get an image
-paths = util.get_image_paths('~/sr/datasets/DIV2K/DIV2K_valid_HR')
+paths = util.get_image_paths('/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR')
 index = range(801, 811)
 for i in range(10):
     H_path = paths[index]
@@ -50,7 +50,7 @@ for i in range(10):
     ax[1].imshow(img_L_A)
     ax[0].set_xlabel('Bicubic')
     ax[1].set_xlabel('Augmentor')
-    fig.savefig(f'~/sr/KAIR/aug_images/{i}.png', bbox_inches='tight')
+    fig.savefig(f'aug_images/{i}.png', bbox_inches='tight')
 
 # calculate psnr
 # psnr = util.calculate_psnr(img_L, img_L_A)
