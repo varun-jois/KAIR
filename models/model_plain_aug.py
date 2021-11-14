@@ -205,7 +205,7 @@ class ModelPlainAug(ModelBase):
         self.E_A = self.netG(self.L_A)
 
         # update hard_ratio
-        if current_step % 200_000 == 0:
+        if current_step % 10_000 == 0:
             self.hard_ratio += 1
 
         # calculate individual losses

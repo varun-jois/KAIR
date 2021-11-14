@@ -49,7 +49,7 @@ for i in range(10):
 
     # calculate psnr
     psnr = util.calculate_psnr(img_L, img_L_A)
-    print(psnr)
+    # print(psnr)
 
     # save image
     final = np.concatenate((img_L, img_L_A), axis=1)
@@ -62,7 +62,8 @@ for i in range(10):
     # ax[0].set_xlabel('Bicubic')
     # ax[1].set_xlabel('Augmentor')
     # fig.savefig(f'aug_images/{i}.png', bbox_inches='tight')
-    # print(f'Saved image {i}')
+
+    print(f'Saved image {i}')
 
 # calculate psnr
 # psnr = util.calculate_psnr(img_L, img_L_A)
