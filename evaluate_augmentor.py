@@ -16,7 +16,7 @@ import utils.utils_image as util
 
 # load the model
 aug = RRDBNET_AUG()
-state_dict = torch.load('superresolution/sraug_x4_psnr/models/35000_A.pth')
+state_dict = torch.load('superresolution/sraug_x4_psnr/models/65000_A.pth')
 aug.load_state_dict(state_dict)
 
 
@@ -48,7 +48,7 @@ for i in range(10):
     img_L_A = util.tensor2uint(img_L_A)
 
     # calculate psnr
-    psnr = util.calculate_psnr(img_L, img_L_A)
+    psnr = round(util.calculate_psnr(img_L, img_L_A), 2)
     # print(psnr)
 
     # save image
