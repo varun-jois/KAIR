@@ -46,17 +46,23 @@ for i in range(10):
     # convert back to uint and save
     img_L = util.single2uint(img_L)
     img_L_A = util.tensor2uint(img_L_A)
-    # final = np.concatenate((img_L, img_L_A), axis=1)
-    # util.imwrite(final, '/home/varun/PhD/super_resolution/img.png')
+
+    # calculate psnr
+    psnr = util.calculate_psnr(img_L, img_L_A)
+    print(psnr)
+
+    # save image
+    final = np.concatenate((img_L, img_L_A), axis=1)
+    util.imwrite(final, f'aug_images/{i}_{psnr}.png')
 
     # lets look at both
-    fig, ax = plt.subplots(1, 2)
-    ax[0].imshow(img_L)
-    ax[1].imshow(img_L_A)
-    ax[0].set_xlabel('Bicubic')
-    ax[1].set_xlabel('Augmentor')
-    fig.savefig(f'aug_images/{i}.png', bbox_inches='tight')
-    print(f'Saved image {i}')
+    # fig, ax = plt.subplots(1, 2)
+    # ax[0].imshow(img_L)
+    # ax[1].imshow(img_L_A)
+    # ax[0].set_xlabel('Bicubic')
+    # ax[1].set_xlabel('Augmentor')
+    # fig.savefig(f'aug_images/{i}.png', bbox_inches='tight')
+    # print(f'Saved image {i}')
 
 # calculate psnr
 # psnr = util.calculate_psnr(img_L, img_L_A)
