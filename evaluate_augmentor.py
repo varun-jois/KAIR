@@ -13,58 +13,59 @@ from models.network_rrdbnet_augmentor import RRDBNET_AUG
 import matplotlib.pyplot as plt
 import utils.utils_image as util
 
-
-# load the model
-aug = RRDBNET_AUG()
-state_dict = torch.load('superresolution/sraug_x4_psnr/models/65000_A.pth')
-aug.load_state_dict(state_dict)
-
-
-# get an image
+# image paths
 paths = util.get_image_paths('/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR')
-for i in range(5):
-    H_path = paths[i]
-    img = util.imread_uint(H_path, 3)  # or manually set path   '/home/varun/PhD/super_resolution/vrj_data/div2k_0112.png'
-    img = util.modcrop(img, 4)
-    img_H = util.uint2single(img)
-    # plt.imshow(img_H)
+hr_steps = {1: 40000, 4: 65000, 16: 68000, 64: 72000, 256: 76000, 1024: 80000, 4096: 84000, 16384: 88000}
+dir = '/home/varun/sr/KAIR/aug_images'
 
-    # use matlab's bicubic downsampling
-    img_L = util.imresize_np(img_H, 1 / 4, True)
+# the images to evaluate
+idx = np.random.randint(0, 100, 5)
 
-    # downsample with augmentor
-    imgt = util.uint2tensor4(img)
-    oom = False
-    try:
-        with torch.no_grad():
-            img_L_A = aug(imgt)
-    except RuntimeError:  # Out of memory
-        oom = True
-    if oom:
-        continue
+for hr, step in hr_steps.items():
 
-    # convert back to uint and save
-    img_L = util.single2uint(img_L)
-    img_L_A = util.tensor2uint(img_L_A)
+    # load the model
+    model_name = f'{step}_A.pth'
+    aug = RRDBNET_AUG()
+    state_dict = torch.load(os.path.join('/home/varun/sr/KAIR/superresolution/sraug_x4_psnr/models', model_name))
+    aug.load_state_dict(state_dict)
 
-    # calculate psnr
-    psnr = round(util.calculate_psnr(img_L, img_L_A), 2)
-    # print(psnr)
+    # create the directory
+    folder = os.path.join(dir, str(hr))
+    if not os.path.exists(folder):
+        os.makedirs(folder)
 
-    # save image
-    final = np.concatenate((img_L, img_L_A), axis=1)
-    util.imwrite(final, f'aug_images/{i}_{psnr}.png')
+    for i in idx:
+        # pick a random pic
+        H_path = paths[i]
+        img_name = os.path.basename(H_path)
+        img = util.imread_uint(H_path, 3)  # or manually set path   '/home/varun/PhD/super_resolution/vrj_data/div2k_0112.png'
+        img = util.modcrop(img, 4)
+        img_H = util.uint2single(img)
 
-    # lets look at both
-    # fig, ax = plt.subplots(1, 2)
-    # ax[0].imshow(img_L)
-    # ax[1].imshow(img_L_A)
-    # ax[0].set_xlabel('Bicubic')
-    # ax[1].set_xlabel('Augmentor')
-    # fig.savefig(f'aug_images/{i}.png', bbox_inches='tight')
+        # use matlab's bicubic downsampling
+        img_L = util.imresize_np(img_H, 1 / 4, True)
 
-    print(f'Saved image {i}')
+        # downsample with augmentor
+        imgt = util.uint2tensor4(img)
+        oom = False
+        try:
+            with torch.no_grad():
+                img_L_A = aug(imgt)
+        except RuntimeError:  # Out of memory
+            oom = True
+        if oom:
+            continue
 
-# calculate psnr
-# psnr = util.calculate_psnr(img_L, img_L_A)
-# print(psnr)
+        # convert back to uint and save
+        img_L = util.single2uint(img_L)
+        img_L_A = util.tensor2uint(img_L_A)
+
+        # calculate psnr
+        psnr = round(util.calculate_psnr(img_L, img_L_A), 2)
+
+        # save image
+        final = np.concatenate((img_L, img_L_A), axis=1)
+        file = os.path.join(folder, f'{img_name}_{hr}_{psnr}.png')
+        util.imwrite(final, file)
+
+    print(f'Finished {hr}')
