@@ -1,6 +1,6 @@
 #########
 import os
-
+from pathlib import Path
 import numpy as np
 from PyQt5.QtCore import QLibraryInfo
 import cv2
@@ -37,7 +37,7 @@ for hr, step in hr_steps.items():
     for i in idx:
         # pick a random pic
         H_path = paths[i]
-        img_name = os.path.basename(H_path)
+        img_name = Path(H_path).stem
         img = util.imread_uint(H_path, 3)  # or manually set path   '/home/varun/PhD/super_resolution/vrj_data/div2k_0112.png'
         img = util.modcrop(img, 4)
         img_H = util.uint2single(img)
