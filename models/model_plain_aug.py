@@ -29,7 +29,7 @@ class ModelPlainAug(ModelBase):
         self.netG = self.model_to_device(self.netG)
         self.netA = define_A(opt)
         self.netA = self.model_to_device(self.netA)
-        self.hard_ratio = 7
+        self.hard_ratio = 8
         self.augmentation_wt = 1
         if self.opt_train['E_decay'] > 0:
             self.netE = define_G(opt).to(self.device).eval()
@@ -205,8 +205,8 @@ class ModelPlainAug(ModelBase):
         self.E_A = self.netG(self.L_A)
 
         # update hard_ratio
-        if (current_step - 1) % 2_000 == 0:  # 200 steps is 1 epoch for div2k train and batch size of 4
-            self.hard_ratio *= 2
+        # if (current_step - 1) % 2_000 == 0:  # 200 steps is 1 epoch for div2k train and batch size of 4
+        #     self.hard_ratio *= 2
 
         # calculate individual losses
         loss_E = self.G_lossfn(self.E, self.H)
@@ -214,7 +214,8 @@ class ModelPlainAug(ModelBase):
 
         # augmentor loss
         # A_loss = loss_E_A + self.augmentation_wt * torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E))
-        A_loss = torch.exp(-(loss_E_A - loss_E))  # extreme loss
+        A_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E))
+        # A_loss = torch.exp(-(loss_E_A - loss_E))  # extreme loss
         A_loss.backward(retain_graph=True)
         self.A_optimizer.step()
 

@@ -105,7 +105,7 @@
     , "E_param_strict": true
 
     , "checkpoint_test": 500000000000           // skip testing  they used 5000
-    , "checkpoint_save": 200           // for saving model 5000
+    , "checkpoint_save": 1000           // for saving model 5000
     , "checkpoint_print": 200           // for print they used 200
     , "hard_ratio_start": 2             // The starting value of the hard ratio UNUSED
     , "hard_ratio_end": 20              // The final value of the hard ratio
