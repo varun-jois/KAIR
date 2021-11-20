@@ -21,7 +21,7 @@ def compare_augmentor_models():
     # image paths
     paths = util.get_image_paths('/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR')
     # hr_steps = {1: 40000, 4: 65000, 16: 68000, 64: 72000, 256: 76000, 1024: 80000, 4096: 84000, 16384: 88000}
-    hr_steps = {2: 200, 4: 400, 6: 600}
+    hr_steps = {1: 2000, 2: 15000, 3: 30000}
     dir = '/home/varun/sr/KAIR/aug_images'
 
     # the images to evaluate
