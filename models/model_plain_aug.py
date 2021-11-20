@@ -53,6 +53,8 @@ class ModelPlainAug(ModelBase):
         self.load_optimizers()                # load optimizer
         self.define_scheduler()               # define scheduler
         self.log_dict = OrderedDict()         # log
+        self.log_dict['G_loss_epoch'] = 0
+        self.log_dict['A_loss_epoch'] = 0
 
     # ----------------------------------------
     # load pre-trained G model
@@ -249,6 +251,8 @@ class ModelPlainAug(ModelBase):
         # self.log_dict['G_loss'] = G_loss.item()/self.E.size()[0]  # if `reduction='sum'`
         self.log_dict['G_loss'] = G_loss.item()
         self.log_dict['A_loss'] = A_loss.item()
+        self.log_dict['G_loss_epoch'] += G_loss.item()
+        self.log_dict['A_loss_epoch'] += A_loss.item()
         self.log_dict['hard_ratio'] = self.hard_ratio
 
         if self.opt_train['E_decay'] > 0:
@@ -282,6 +286,15 @@ class ModelPlainAug(ModelBase):
     # ----------------------------------------
     def current_log(self):
         return self.log_dict
+
+    # ----------------------------------------
+    # get epoch_stats
+    # ----------------------------------------
+    def get_epoch_stats(self):
+        G_loss_epoch = self.log_dict['G_loss_epoch']
+        A_loss_epoch = self.log_dict['A_loss_epoch']
+        self.log_dict['G_loss_epoch'] = self.log_dict['A_loss_epoch'] = 0
+        return G_loss_epoch, A_loss_epoch
 
     # ----------------------------------------
     # get L, E, H image

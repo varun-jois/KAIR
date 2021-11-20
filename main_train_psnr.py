@@ -271,6 +271,11 @@ def main(json_path='options/train_msrresnet_psnr.json'):
                 # testing log
                 logger.info('<epoch:{:3d}, iter:{:8,d}, Average PSNR : {:<.2f}dB\n'.format(epoch, current_step, avg_psnr))
 
+        # get epoch level data
+        G_loss_epoch, A_loss_epoch = model.get_epoch_stats()
+        message = '<epoch stats- G_loss:{:.3e}, A_loss:{:.3e}> '.format(G_loss_epoch / len(train_loader), A_loss_epoch / len(train_loader))
+        logger.info(message)
+
 
 if __name__ == '__main__':
     main()
