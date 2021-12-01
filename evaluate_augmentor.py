@@ -29,11 +29,17 @@ def compare_augmentor_models():
 
     for hr, step in hr_steps.items():
 
-        # load the model
+        # load the augmentor
         model_name = f'{step}_A.pth'
         aug = RRDBNET_AUG()
         state_dict = torch.load(os.path.join('/home/varun/sr/KAIR/superresolution/sraug_x4_psnr/models', model_name))
         aug.load_state_dict(state_dict)
+
+        # load the generator
+        model_name = f'{step}_G.pth'
+        gen = RRDBNet()
+        state_dict = torch.load(os.path.join('/home/varun/sr/KAIR/superresolution/sraug_x4_psnr/models', model_name))
+        gen.load_state_dict(state_dict)
 
         # create the directory
         folder = os.path.join(dir, str(hr))
@@ -62,17 +68,43 @@ def compare_augmentor_models():
             if oom:
                 continue
 
+            # evaluate generator for bicubic and augmentor data
+            oom = False
+            try:
+                with torch.no_grad():
+                    img_E = gen(util.single2tensor4(img_L))
+                    img_E_A = gen(img_L_A)
+            except RuntimeError:  # Out of memory
+                oom = True
+            if oom:
+                print(f'Failed to generate image.')
+                continue
+
             # convert back to uint and save
             img_L = util.single2uint(img_L)
             img_L_A = util.tensor2uint(img_L_A)
+            img_E = util.tensor2uint(img_E)
+            img_E_A = util.tensor2uint(img_E_A)
 
             # calculate psnr
             psnr = round(util.calculate_psnr(img_L, img_L_A), 2)
+            psnr_E = round(util.calculate_psnr(img_E, img), 2)
+            psnr_E_A = round(util.calculate_psnr(img_E_A, img), 2)
 
             # save image
             final = np.concatenate((img_L, img_L_A), axis=1)
             file = os.path.join(folder, f'{img_name}_{hr}_{psnr}.png')
             util.imwrite(final, file)
+
+            file = os.path.join(folder, f'{img_name}_{hr}_{psnr_E}_E.png')
+            util.imwrite(img_E, file)
+
+            file = os.path.join(folder, f'{img_name}_{hr}_{psnr_E_A}_E_A.png')
+            util.imwrite(img_E_A, file)
+
+            # save the original HR image
+            file = os.path.join(folder, f'{img_name}.png')
+            util.imwrite(img, file)
 
         print(f'Finished {hr}')
 
