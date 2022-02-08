@@ -9,7 +9,7 @@
 
   , "path": {
     "root": "superresolution"      // "denoising" | "superresolution"
-    , "pretrained_netG": "/home/varun/sr/KAIR/model_zoo/40000_G.pth" // path of pretrained model
+    , "pretrained_netG": null // "/home/varun/sr/KAIR/model_zoo/40000_G.pth" // path of pretrained model
     , "pretrained_netA": null      // path of pretrained model
     , "pretrained_netE": null      // path of pretrained model
   }
@@ -37,7 +37,7 @@
       , "shuffle_prob": 0.1             //
       , "use_sharp": false
 
-      , "dataroot_H": "/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR" //"~/sr/datasets/DIV2K/DIV2K_valid_HR"  testsets/set5  // path of H testing dataset
+      , "dataroot_H": "/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR_randSample" //"~/sr/datasets/DIV2K/DIV2K_valid_HR"  testsets/set5  // path of H testing dataset
       , "dataroot_L": null              // path of L testing dataset
     }
   }
@@ -76,6 +76,19 @@
     , "init_bn_type": "uniform"         // "uniform" | "constant"
     , "init_gain": 0.2
   }
+
+  , "netD": {                        // Used for the discriminator used by the augmentor
+    "net_type": "discriminator_unet" // "discriminator_patchgan" | "discriminator_unet"
+    , "in_nc": 3
+    , "base_nc": 64
+    , "n_layers": 3                  // only for "net_type":"discriminator_patchgan"
+    , "norm_type": "spectral"        // only for "net_type":"discriminator_patchgan"  | 'batch', 'instance', 'spectral', 'batchspectral', 'instancespectral'
+
+    , "init_type": "orthogonal"      // "orthogonal" | "normal" | "uniform" | "xavier_normal" | "xavier_uniform" | "kaiming_normal" | "kaiming_uniform"
+    , "init_bn_type": "uniform"      // "uniform" | "constant"
+    , "init_gain": 0.2
+  }
+
   , "train": {
       "G_lossfn_type": "l1"             // "l1" preferred | "l2sum" | "l2" | "ssim"
     , "G_lossfn_weight": 1.0            // default
@@ -104,8 +117,17 @@
     , "G_param_strict": true
     , "E_param_strict": true
 
+    // here are the options for the augmentor's discriminator
+    , "D_optimizer_lr": 5e-5
+    , "D_scheduler_milestones": [800000, 1600000]
+    , "D_scheduler_gamma": 0.5
+    , "D_optimizer_reuse": false
+    , "D_param_strict": true,
+    , "D_lossfn_weight": 0.5
+
+
     , "checkpoint_test": 500000000000           // skip testing  they used 5000
-    , "checkpoint_save": 5000           // for saving model 5000
+    , "checkpoint_save": 1000           // for saving model 5000
     , "checkpoint_print": 20000000000           // for print they used 200
     , "hard_ratio_start": 2             // The starting value of the hard ratio UNUSED
     , "hard_ratio_end": 20              // The final value of the hard ratio
