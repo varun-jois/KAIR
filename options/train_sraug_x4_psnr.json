@@ -78,7 +78,7 @@
   }
 
   , "netD": {                        // Used for the discriminator used by the augmentor
-    "net_type": "discriminator_vgg_48" // "discriminator_patchgan" | "discriminator_unet"
+    "net_type": "discriminator_vgg_96" // "discriminator_patchgan" | "discriminator_unet"
     , "in_nc": 3
     , "base_nc": 64
     , "n_layers": 3                  // only for "net_type":"discriminator_patchgan"
