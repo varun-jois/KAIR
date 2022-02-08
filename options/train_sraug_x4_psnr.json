@@ -21,7 +21,7 @@
       , "dataroot_H": "/home/varun/sr/datasets/DIV2K/DIV2K_train_HR"  //"~/sr/datasets/DIV2K/DIV2K_train_HR"  // path of H training dataset trainsets/trainH
       , "dataroot_L": null              // path of L training dataset
 
-      , "H_size": 240                   // patch_size 256 | 288 | 320  240
+      , "H_size": 192                   // patch_size 256 | 288 | 320  240
       , "shuffle_prob": 0.1
       , "use_sharp": false
 
@@ -78,7 +78,7 @@
   }
 
   , "netD": {                        // Used for the discriminator used by the augmentor
-    "net_type": "discriminator_unet" // "discriminator_patchgan" | "discriminator_unet"
+    "net_type": "discriminator_vgg_48" // "discriminator_patchgan" | "discriminator_unet"
     , "in_nc": 3
     , "base_nc": 64
     , "n_layers": 3                  // only for "net_type":"discriminator_patchgan"

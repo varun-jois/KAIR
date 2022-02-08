@@ -276,7 +276,7 @@ class ModelPlainAug(ModelBase):
             p.requires_grad = True
         self.AD_optimizer.zero_grad()
         # real
-        pred_d_real = self.netAD(self.H)
+        pred_d_real = self.netAD(self.L)
         l_d_real = 0.5 * self.AD_lossfn(pred_d_real, True)
         l_d_real.backward()
         # fake

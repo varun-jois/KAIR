@@ -137,6 +137,39 @@ class Discriminator_UNet(nn.Module):
 
         return out
 
+# --------------------------------------------
+# VGG style Discriminator with 48x48 input
+# --------------------------------------------
+class Discriminator_VGG_48(nn.Module):
+    def __init__(self, in_nc=3, base_nc=64, ac_type='BL'):
+        super(Discriminator_VGG_48, self).__init__()
+        # features
+        # hxw, c
+        # 48, 64
+        conv0 = B.conv(in_nc, base_nc, kernel_size=3, mode='C')
+        conv1 = B.conv(base_nc, base_nc, kernel_size=4, stride=2, mode='C'+ac_type)
+        # 24, 64
+        conv2 = B.conv(base_nc, base_nc*2, kernel_size=3, stride=1, mode='C'+ac_type)
+        conv3 = B.conv(base_nc*2, base_nc*2, kernel_size=4, stride=2, mode='C'+ac_type)
+        # 12, 128
+        conv4 = B.conv(base_nc*2, base_nc*4, kernel_size=3, stride=1, mode='C'+ac_type)
+        conv5 = B.conv(base_nc*4, base_nc*4, kernel_size=4, stride=2, mode='C'+ac_type)
+        # 6, 256
+        conv6 = B.conv(base_nc*4, base_nc*8, kernel_size=3, stride=1, mode='C'+ac_type)
+        conv7 = B.conv(base_nc*8, base_nc*8, kernel_size=4, stride=2, mode='C'+ac_type)
+        # 3, 512
+        self.features = B.sequential(conv0, conv1, conv2, conv3, conv4,
+                                     conv5, conv6, conv7)
+
+        # classifier
+        self.classifier = nn.Sequential(
+            nn.Linear(512 * 3 * 3, 100), nn.LeakyReLU(0.2, True), nn.Linear(100, 1))
+
+    def forward(self, x):
+        x = self.features(x)
+        x = x.view(x.size(0), -1)
+        x = self.classifier(x)
+        return x
 
 # --------------------------------------------
 # VGG style Discriminator with 96x96 input
