@@ -19,13 +19,13 @@ import utils.utils_image as util
 def compare_augmentor_models():
 
     # image paths
-    paths = util.get_image_paths('/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR')
+    paths = util.get_image_paths('/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR_randSample')
     # hr_steps = {1: 40000, 4: 65000, 16: 68000, 64: 72000, 256: 76000, 1024: 80000, 4096: 84000, 16384: 88000}
-    hr_steps = {'5k': 5000, '10k': 10_000, '15k': 15_000, '20k': 20_000}
+    hr_steps = {'8': 1000, '8': 5_000, '8': 10_000, '8': 20_000}
     dir = '/home/varun/sr/KAIR/aug_images'
 
     # the images to evaluate
-    idx = np.random.randint(0, 100, 5)
+    idx = np.random.randint(0, 10, 5)
 
     for hr, step in hr_steps.items():
 
@@ -103,8 +103,8 @@ def compare_augmentor_models():
             util.imwrite(img_E_A, file)
 
             # save the original HR image
-            file = os.path.join(folder, f'{img_name}.png')
-            util.imwrite(img, file)
+            # file = os.path.join(folder, f'{img_name}.png')
+            # util.imwrite(img, file)
 
         print(f'Finished {hr}')
 
