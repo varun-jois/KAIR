@@ -122,7 +122,7 @@
     , "D_scheduler_milestones": [800000, 1600000]
     , "D_scheduler_gamma": 0.5
     , "D_optimizer_reuse": false
-    , "D_param_strict": true,
+    , "D_param_strict": true
     , "D_lossfn_weight": 0.5
 
 
