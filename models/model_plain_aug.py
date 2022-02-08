@@ -31,7 +31,7 @@ class ModelPlainAug(ModelBase):
         self.netA = self.model_to_device(self.netA)
         self.netAD = define_D(opt)
         self.netAD = self.model_to_device(self.netAD)
-        self.hard_ratio = 8
+        self.hard_ratio = 2
         self.augmentation_wt = 1
         if self.opt_train['E_decay'] > 0:
             self.netE = define_G(opt).to(self.device).eval()
