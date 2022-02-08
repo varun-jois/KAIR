@@ -227,7 +227,6 @@ def define_G(opt):
 def define_D(opt):
     opt_net = opt['netD']
     net_type = opt_net['net_type']
-
     # ----------------------------------------
     # discriminator_vgg_48
     # ----------------------------------------
