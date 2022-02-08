@@ -234,7 +234,7 @@ def define_D(opt):
         from models.network_discriminator import Discriminator_VGG_48 as discriminator
         netD = discriminator(in_nc=opt_net['in_nc'],
                              base_nc=opt_net['base_nc'],
-                             ac_type='BL')
+                             ac_type=['act_mode'])
 
     # ----------------------------------------
     # discriminator_vgg_96
