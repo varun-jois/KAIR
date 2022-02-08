@@ -233,7 +233,8 @@ def define_D(opt):
     if net_type == 'discriminator_vgg_48':
         from models.network_discriminator import Discriminator_VGG_48 as discriminator
         netD = discriminator(in_nc=opt_net['in_nc'],
-                             base_nc=opt_net['base_nc'])
+                             base_nc=opt_net['base_nc'],
+                             ac_type='BL')
 
     # ----------------------------------------
     # discriminator_vgg_96
