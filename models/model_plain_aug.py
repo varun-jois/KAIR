@@ -278,11 +278,11 @@ class ModelPlainAug(ModelBase):
         # real
         pred_d_real = self.netAD(self.L)
         l_d_real = 0.5 * self.AD_lossfn(pred_d_real, True)
-        l_d_real.backward()
         # fake
         pred_d_fake = self.netAD(self.L_A.detach())  # 2) fake data, detach to avoid BP to G
         l_d_fake = 0.5 * self.AD_lossfn(pred_d_fake, False)
-        l_d_fake.backward()
+        AD_loss = l_d_real + l_d_fake
+        AD_loss.backward()
         self.AD_optimizer.step()
 
         # optimize the generator (like this otherwise grads will be calculated for the Augmentor giving an error)
@@ -317,9 +317,10 @@ class ModelPlainAug(ModelBase):
         # self.log_dict['G_loss'] = G_loss.item()/self.E.size()[0]  # if `reduction='sum'`
         self.log_dict['G_loss'] = G_loss.item()
         self.log_dict['A_loss'] = A_loss.item()
+        self.log_dict['AD_loss'] = AD_loss.item()
         self.log_dict['G_loss_epoch'] += G_loss.item()
         self.log_dict['A_loss_epoch'] += A_loss.item()
-        self.log_dict['AD_loss_epoch'] += A_loss.item()
+        self.log_dict['AD_loss_epoch'] += AD_loss.item()
         self.log_dict['hard_ratio'] = self.hard_ratio
 
         if self.opt_train['E_decay'] > 0:
