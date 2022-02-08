@@ -25,7 +25,7 @@ def compare_augmentor_models():
     dir = '/home/varun/sr/KAIR/aug_images'
 
     # the images to evaluate
-    idx = np.random.randint(0, 10, 5)
+    idx = range(5)  # np.random.randint(0, 10, 5)
 
     for hr, step in hr_steps.items():
 
@@ -40,6 +40,7 @@ def compare_augmentor_models():
         gen = RRDBNet()
         state_dict = torch.load(os.path.join('/home/varun/sr/KAIR/superresolution/sraug_x4_psnr/models', model_name))
         gen.load_state_dict(state_dict)
+        print('loaded model')
 
         # create the directory
         folder = os.path.join(dir, str(hr))
