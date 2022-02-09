@@ -21,11 +21,11 @@ def compare_augmentor_models():
     # image paths
     paths = util.get_image_paths('/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR_randSample')
     # hr_steps = {1: 40000, 4: 65000, 16: 68000, 64: 72000, 256: 76000, 1024: 80000, 4096: 84000, 16384: 88000}
-    hr_steps = {'1K': 1000, '5k': 5_000, '10k': 10_000, '20k': 20_000}
+    hr_steps = {'1K': 1000, '7k': 7_000, '20k': 20_000}
     dir = '/home/varun/sr/KAIR/aug_images'
 
     # the images to evaluate
-    idx = range(5)  # np.random.randint(0, 10, 5)
+    idx = range(3)  # np.random.randint(0, 10, 5)
 
     for hr, step in hr_steps.items():
 
@@ -126,7 +126,6 @@ def compare_with_JPEG(hard_ratio, quality_factor=90):
 
 
 #  def test_generator():
-
 
 
 if __name__ == '__main__':
