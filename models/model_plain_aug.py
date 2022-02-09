@@ -60,6 +60,9 @@ class ModelPlainAug(ModelBase):
         self.log_dict['A_loss_epoch'] = 0
         self.log_dict['G_loss_epoch'] = 0
         self.log_dict['AD_loss_epoch'] = 0
+        self.log_dict['AD_loss_aug'] = 0
+        self.log_dict['l_d_real'] = 0
+        self.log_dict['l_d_fake'] = 0
 
     # ----------------------------------------
     # load pre-trained G model
