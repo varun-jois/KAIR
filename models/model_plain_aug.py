@@ -31,7 +31,7 @@ class ModelPlainAug(ModelBase):
         self.netA = self.model_to_device(self.netA)
         self.netAD = define_D(opt)
         self.netAD = self.model_to_device(self.netAD)
-        self.hard_ratio = 2
+        self.hard_ratio = 1
         self.augmentation_wt = 1
         if self.opt_train['E_decay'] > 0:
             self.netE = define_G(opt).to(self.device).eval()
@@ -262,11 +262,11 @@ class ModelPlainAug(ModelBase):
 
         # get the loss from the discriminator
         pred_fake = self.netAD(self.L_A)
-        AD_loss = 0.5 * self.AD_lossfn(pred_fake, True)
+        AD_loss_aug = 0.5 * self.AD_lossfn(pred_fake, True)
 
         # augmentor loss
         # A_loss = loss_E_A + self.augmentation_wt * torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E))
-        A_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss
+        A_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss_aug
         # A_loss = torch.exp(-(loss_E_A - loss_E))  # extreme loss
         A_loss.backward(retain_graph=True)
         self.A_optimizer.step()
@@ -318,9 +318,14 @@ class ModelPlainAug(ModelBase):
         self.log_dict['G_loss'] = G_loss.item()
         self.log_dict['A_loss'] = A_loss.item()
         self.log_dict['AD_loss'] = AD_loss.item()
+
         self.log_dict['G_loss_epoch'] += G_loss.item()
         self.log_dict['A_loss_epoch'] += A_loss.item()
         self.log_dict['AD_loss_epoch'] += AD_loss.item()
+        self.log_dict['AD_loss_aug'] += AD_loss_aug.item()
+        self.log_dict['l_d_real'] += l_d_real.item()
+        self.log_dict['l_d_fake'] += l_d_fake.item()
+
         self.log_dict['hard_ratio'] = self.hard_ratio
 
         if self.opt_train['E_decay'] > 0:
@@ -359,13 +364,12 @@ class ModelPlainAug(ModelBase):
     # get epoch_stats
     # ----------------------------------------
     def get_epoch_stats(self):
-        G_loss_epoch = self.log_dict['G_loss_epoch']
-        A_loss_epoch = self.log_dict['A_loss_epoch']
-        AD_loss_epoch = self.log_dict['AD_loss_epoch']
-        self.log_dict['G_loss_epoch'] = 0
-        self.log_dict['A_loss_epoch'] = 0
-        self.log_dict['AD_loss_epoch'] = 0
-        return G_loss_epoch, A_loss_epoch, AD_loss_epoch
+        s = {'G_loss_epoch', 'A_loss_epoch', 'AD_loss_epoch', 'AD_loss_aug', 'l_d_real', 'l_d_fake'}
+        subset = {k: v for k, v in self.log_dict.items() if k in s}
+        # message = ' '.join([f'{k:s}:{v:.3e}' for k, v in subset.items()])
+        for k in s:
+            self.log_dict[k] = 0
+        return subset
 
     # ----------------------------------------
     # get L, E, H image
