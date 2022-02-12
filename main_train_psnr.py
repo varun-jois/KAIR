@@ -272,11 +272,10 @@ def main(json_path='options/train_msrresnet_psnr.json'):
                 logger.info('<epoch:{:3d}, iter:{:8,d}, Average PSNR : {:<.2f}dB\n'.format(epoch, current_step, avg_psnr))
 
         # get epoch level data
-        if opt['task'][:3] == 'aug':
-            epoch_stats = model.get_epoch_stats()
-            s = len(train_loader)
-            message = ' '.join([f'{k:s}:{v / s:.3e}' for k, v in epoch_stats.items()])
-            logger.info(message)
+        epoch_stats = model.get_epoch_stats()
+        s = len(train_loader)
+        message = ' '.join([f'{k:s}:{v / s:.3e}' for k, v in epoch_stats.items()])
+        logger.info(message)
 
 
 if __name__ == '__main__':

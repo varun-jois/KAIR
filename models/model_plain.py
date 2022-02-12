@@ -44,6 +44,8 @@ class ModelPlain(ModelBase):
         self.load_optimizers()                # load optimizer
         self.define_scheduler()               # define scheduler
         self.log_dict = OrderedDict()         # log
+        self.log_dict['G_loss_epoch'] = 0
+
 
     # ----------------------------------------
     # load pre-trained G model
@@ -174,6 +176,8 @@ class ModelPlain(ModelBase):
         # self.log_dict['G_loss'] = G_loss.item()/self.E.size()[0]  # if `reduction='sum'`
         self.log_dict['G_loss'] = G_loss.item()
 
+        self.log_dict['G_loss_epoch'] += G_loss.item()
+
         if self.opt_train['E_decay'] > 0:
             self.update_E(self.opt_train['E_decay'])
 
@@ -256,3 +260,12 @@ class ModelPlain(ModelBase):
     def info_params(self):
         msg = self.describe_params(self.netG)
         return msg
+
+    def get_epoch_stats(self):
+        s = {'G_loss_epoch'}
+        subset = {k: v for k, v in self.log_dict.items() if k in s}
+        # message = ' '.join([f'{k:s}:{v:.3e}' for k, v in subset.items()])
+        for k in s:
+            self.log_dict[k] = 0
+        return subset
+
