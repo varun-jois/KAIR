@@ -73,7 +73,7 @@ def main(json_path='options/train_msrresnet_psnr.json'):
     current_step = max(init_iter_G, init_iter_E, init_iter_optimizerG)
     
     # for the augmentor and its optimizer
-    if opt['task'] == 'sraug_x4_psnr':
+    if opt['task'][:3] == 'aug':
         init_iter_A, init_path_A = option.find_last_checkpoint(opt['path']['models'], net_type='A')
         opt['path']['pretrained_netA'] = init_path_A
         init_iter_optimizerA, init_path_optimizerA = option.find_last_checkpoint(opt['path']['models'], net_type='optimizerA')
@@ -272,10 +272,11 @@ def main(json_path='options/train_msrresnet_psnr.json'):
                 logger.info('<epoch:{:3d}, iter:{:8,d}, Average PSNR : {:<.2f}dB\n'.format(epoch, current_step, avg_psnr))
 
         # get epoch level data
-        epoch_stats = model.get_epoch_stats()
-        s = len(train_loader)
-        message = ' '.join([f'{k:s}:{v / s:.3e}' for k, v in epoch_stats.items()])
-        logger.info(message)
+        if opt['task'][:3] == 'aug':
+            epoch_stats = model.get_epoch_stats()
+            s = len(train_loader)
+            message = ' '.join([f'{k:s}:{v / s:.3e}' for k, v in epoch_stats.items()])
+            logger.info(message)
 
 
 if __name__ == '__main__':
