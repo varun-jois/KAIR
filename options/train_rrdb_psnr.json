@@ -20,7 +20,7 @@
     "train": {
       "name": "train_dataset"           // just name
       , "dataset_type": "sr"            // "dncnn" | "dnpatch" | "fdncnn" | "ffdnet" | "sr" | "srmd" | "dpsr" | "plain" | "plainpatch"
-      , "dataroot_H": "/home/varun/sr/datasets/DIV2K/DIV2K_train_HR\"  //\"~/sr/datasets/DIV2K/DIV2K_train_HR"// path of H training dataset
+      , "dataroot_H": "/home/varun/sr/datasets/DIV2K/DIV2K_train_HR"  //\"~/sr/datasets/DIV2K/DIV2K_train_HR"// path of H training dataset
       , "dataroot_L": null              // path of L training dataset
       , "H_size": 192                    // patch size 40 | 64 | 96 | 128 | 192
       , "dataloader_shuffle": true
