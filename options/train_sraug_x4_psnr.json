@@ -1,7 +1,7 @@
 {
   "task": "sraug_x4_psnr"     //  root/task/images|models|options
   , "model": "plain_aug"           // "plain" | "plain2" if two inputs
-  , "gpu_ids": [1, 2]             // [0,1,2,3] for 4 GPUs
+  , "gpu_ids": [1]             // [0,1,2,3] for 4 GPUs
   , "dist": true
 
   , "scale": 4       // broadcast to "datasets"
