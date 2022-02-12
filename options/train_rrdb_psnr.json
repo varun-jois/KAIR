@@ -1,5 +1,5 @@
 {
-  "task": "pretrain_x4_rrdb"     //  root/task/images-models-options
+  "task": "baseline_x4_rrdb"     //  root/task/images-models-options
   , "model": "plain" // "plain" | "plain2" if two inputs
   , "gpu_ids": [1]
 
