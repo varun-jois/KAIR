@@ -159,15 +159,16 @@ def test_generator(device):
         img_L = util.imresize_np(img_H, 1 / 4, True)
 
         # evaluate generator for bicubic and augmentor data
-        oom = False
-        try:
-            with torch.no_grad():
-                img_E = gen(util.single2tensor4(img_L))
-        except RuntimeError:  # Out of memory
-            oom = True
-        if oom:
-            print(f'Failed to generate image.')
-            continue
+        img_E = gen(util.single2tensor4(img_L))
+        # oom = False
+        # try:
+        #     with torch.no_grad():
+        #         img_E = gen(util.single2tensor4(img_L))
+        # except RuntimeError:  # Out of memory
+        #     oom = True
+        # if oom:
+        #     print(f'Failed to generate image.')
+        #     continue
 
         # convert back to uint and save
         img_L = util.single2uint(img_L)
@@ -191,6 +192,6 @@ def test_generator(device):
 
 
 if __name__ == '__main__':
-    device = torch.device('cpu')
+    device = torch.device('cuda')
     #compare_augmentor_models(device)
     test_generator(device)
