@@ -157,13 +157,12 @@ def test_generator(device):
 
         # use matlab's bicubic downsampling
         img_L = util.imresize_np(img_H, 1 / 4, True)
-        img_L = util.single2tensor4(img_L).to(device)
 
         # evaluate generator for bicubic and augmentor data
         oom = False
         try:
             with torch.no_grad():
-                img_E = gen(img_L)
+                img_E = gen(util.single2tensor4(img_L).to(device))
         except RuntimeError:  # Out of memory
             oom = True
         if oom:
