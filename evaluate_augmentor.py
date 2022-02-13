@@ -16,10 +16,7 @@ import matplotlib.pyplot as plt
 import utils.utils_image as util
 
 
-def compare_augmentor_models():
-
-    # use the gpu
-    device = torch.device('cuda')
+def compare_augmentor_models(device):
 
     # image paths
     paths = util.get_image_paths('/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR_randSample')
@@ -131,8 +128,69 @@ def compare_with_JPEG(hard_ratio, quality_factor=90):
     print(f'Average psnr: {sum(psnrs) / len(psnrs)}')
 
 
-#  def test_generator():
+def test_generator(device):
+    # image paths
+    paths = util.get_image_paths('/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR_randSample')
+    step = '10_000'
+    dir = '/home/varun/sr/KAIR/gen_images'
+    model_dir = '/home/varun/sr/KAIR/superresolution/baseline_x4_rrdb/models'
+
+    # load the model
+    model_name = f'{step}_G.pth'
+    gen = RRDBNet()
+    gen = gen.to(device)
+    state_dict = torch.load(os.path.join(model_dir, model_name))
+    gen.load_state_dict(state_dict)
+    print('loaded model')
+
+    # the images to evaluate
+    idx = range(10)  # np.random.randint(0, 10, 5)
+
+    for i in idx:
+        # pick a random pic
+        H_path = paths[i]
+        img_name = Path(H_path).stem
+        img = util.imread_uint(H_path,
+                               3)  # or manually set path   '/home/varun/PhD/super_resolution/vrj_data/div2k_0112.png'
+        img = util.modcrop(img, 4)
+        img_H = util.uint2single(img)
+
+        # use matlab's bicubic downsampling
+        img_L = util.imresize_np(img_H, 1 / 4, True)
+
+        # evaluate generator for bicubic and augmentor data
+        oom = False
+        try:
+            with torch.no_grad():
+                img_E = gen(util.single2tensor4(img_L))
+        except RuntimeError:  # Out of memory
+            oom = True
+        if oom:
+            print(f'Failed to generate image.')
+            continue
+
+        # convert back to uint and save
+        img_L = util.single2uint(img_L)
+        img_E = util.tensor2uint(img_E)
+
+        # calculate psnr
+        psnr_E = round(util.calculate_psnr(img_E, img), 2)
+
+        # save image
+        file = os.path.join(dir, f'{img_name}_L.png')
+        util.imwrite(img_L, file)
+
+        file = os.path.join(dir, f'{img_name}_{psnr_E}_E.png')
+        util.imwrite(img_E, file)
+
+        # save the original HR image
+        # file = os.path.join(folder, f'{img_name}.png')
+        # util.imwrite(img, file)
+
+    print(f'Finished')
 
 
 if __name__ == '__main__':
-    compare_augmentor_models()
+    device = torch.device('cuda')
+    #compare_augmentor_models(device)
+    test_generator(device)
