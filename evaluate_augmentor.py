@@ -144,7 +144,7 @@ def test_generator(device):
     print('loaded model')
 
     # the images to evaluate
-    idx = range(10)  # np.random.randint(0, 10, 5)
+    idx = range(3)  # np.random.randint(0, 10, 5)
 
     for i in idx:
         # pick a random pic
