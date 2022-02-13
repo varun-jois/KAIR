@@ -31,8 +31,9 @@ class ModelPlainAug(ModelBase):
         self.netA = self.model_to_device(self.netA)
         self.netAD = define_D(opt)
         self.netAD = self.model_to_device(self.netAD)
-        self.hard_ratio = 1
+        self.hard_ratio = opt['train']['hard_ratio_start']
         self.augmentation_wt = 1
+        self.batch_size = opt['datasets']['train']['dataloader_batch_size']
         if self.opt_train['E_decay'] > 0:
             self.netE = define_G(opt).to(self.device).eval()
 
@@ -256,8 +257,8 @@ class ModelPlainAug(ModelBase):
         self.E_A = self.netG(self.L_A)
 
         # update hard_ratio
-        # if (current_step - 1) % 2_000 == 0:  # 200 steps is 1 epoch for div2k train and batch size of 4
-        #     self.hard_ratio *= 2
+        if (current_step - 1) % ((800 / self.batch_size) * 50) == 0:  # 200 steps is 1 epoch for div2k train and batch size of 4
+            self.hard_ratio += 1
 
         # calculate individual losses
         loss_E = self.G_lossfn(self.E, self.H)
@@ -269,7 +270,7 @@ class ModelPlainAug(ModelBase):
 
         # augmentor loss
         # A_loss = loss_E_A + self.augmentation_wt * torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E))
-        A_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) #+ AD_loss_aug
+        A_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss_aug
         # A_loss = torch.exp(-(loss_E_A - loss_E))  # extreme loss
         A_loss.backward(retain_graph=True)
         self.A_optimizer.step()
@@ -369,6 +370,7 @@ class ModelPlainAug(ModelBase):
     def get_epoch_stats(self):
         s = {'G_loss_epoch', 'A_loss_epoch', 'AD_loss_epoch', 'AD_loss_aug', 'l_d_real', 'l_d_fake'}
         subset = {k: v for k, v in self.log_dict.items() if k in s}
+        subset['hard_ratio'] = self.hard_ratio
         # message = ' '.join([f'{k:s}:{v:.3e}' for k, v in subset.items()])
         for k in s:
             self.log_dict[k] = 0
