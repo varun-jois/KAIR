@@ -269,8 +269,8 @@ class ModelPlainAug(ModelBase):
         AD_loss_aug = 0.5 * self.AD_lossfn(pred_fake, True)
 
         # augmentor loss
-        # A_loss = loss_E_A + self.augmentation_wt * torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E))
-        A_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss_aug
+        A_loss = loss_E_A + self.augmentation_wt * torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss_aug
+        # A_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss_aug
         # A_loss = torch.exp(-(loss_E_A - loss_E))  # extreme loss
         A_loss.backward(retain_graph=True)
         self.A_optimizer.step()
@@ -293,7 +293,7 @@ class ModelPlainAug(ModelBase):
         for p in self.netG.parameters():
             p.requires_grad = True
         self.G_optimizer.zero_grad()
-        G_loss = self.G_lossfn(self.E, self.H) + self.G_lossfn(self.netG(self.L_A.detach()), self.H)
+        G_loss = self.G_lossfn(self.E, self.H) / 2 + self.G_lossfn(self.netG(self.L_A.detach()), self.H) / 2
         G_loss.backward()
         # print(f'A after G back, should be unchanged: {self.netA.module.conv_last.weight[0][0][0].grad}')
         # print(f'G after G back, should be changed: {self.netG.module.conv_last.weight[0][0][0].grad}')
