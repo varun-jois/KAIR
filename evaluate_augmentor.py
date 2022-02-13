@@ -18,6 +18,9 @@ import utils.utils_image as util
 
 def compare_augmentor_models():
 
+    # use the gpu
+    device = torch.device('cuda')
+
     # image paths
     paths = util.get_image_paths('/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR_randSample')
     # hr_steps = {1: 40000, 4: 65000, 16: 68000, 64: 72000, 256: 76000, 1024: 80000, 4096: 84000, 16384: 88000}
@@ -33,12 +36,14 @@ def compare_augmentor_models():
         # load the augmentor
         model_name = f'{step}_A.pth'
         aug = RRDBNET_AUG()
+        aug = aug.to(device)
         state_dict = torch.load(os.path.join(model_dir, model_name))
         aug.load_state_dict(state_dict)
 
         # load the generator
         model_name = f'{step}_G.pth'
         gen = RRDBNet()
+        gen = gen.to(device)
         state_dict = torch.load(os.path.join(model_dir, model_name))
         gen.load_state_dict(state_dict)
         print('loaded model')
