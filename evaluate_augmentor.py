@@ -131,7 +131,7 @@ def compare_with_JPEG(hard_ratio, quality_factor=90):
 def test_generator(device):
     # image paths
     paths = util.get_image_paths('/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR_randSample')
-    step = '10_000'
+    step = 10_000
     dir = '/home/varun/sr/KAIR/gen_images'
     model_dir = '/home/varun/sr/KAIR/superresolution/baseline_x4_rrdb/models'
 
