@@ -32,7 +32,7 @@ def compare_augmentor_models():
         # load the augmentor
         model_name = f'{step}_A.pth'
         aug = RRDBNET_AUG()
-        state_dict = torch.load(os.path.join('/home/varun/sr/KAIR/superresolution/sraug_x4_psnr/models', model_name))
+        state_dict = torch.load(os.path.join('/home/varun/sr/KAIR/superresolution/aug_x4_rrdb/models', model_name))
         aug.load_state_dict(state_dict)
 
         # load the generator
