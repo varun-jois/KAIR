@@ -4,6 +4,7 @@ import glob
 from pathlib import Path
 import numpy as np
 from PyQt5.QtCore import QLibraryInfo
+import sys
 import cv2
 
 os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = QLibraryInfo.location(
@@ -191,6 +192,10 @@ def test_generator(device):
 
 
 if __name__ == '__main__':
+    test_generator = sys.argv[1]
     device = torch.device('cuda')
-    #compare_augmentor_models(device)
-    test_generator(device)
+    if test_generator:
+        test_generator(device)
+    else:
+        compare_augmentor_models(device)
+
