@@ -246,20 +246,24 @@ class ModelPlainAug(ModelBase):
         # torch.autograd.set_detect_anomaly(True)
 
         # freezing the generator and discriminator graphs
-        for p in self.netG.parameters():
-            p.requires_grad = False
+        for p in self.netA.parameters():
+            p.requires_grad = True
         for p in self.netAD.parameters():
             p.requires_grad = False
+        for p in self.netG.parameters():
+            p.requires_grad = False
+
+
+        # update hard_ratio
+        epoch_to_update = 5000000
+        if (current_step - 1) % ((800 / self.batch_size) * epoch_to_update) == 0:  # 200 steps is 1 epoch for div2k train and batch size of 4
+            print('increasing hard ratio')
+            self.hard_ratio += 1
 
         self.A_optimizer.zero_grad()
         self.L_A = self.netA(self.H)
         self.E = self.netG(self.L)
         self.E_A = self.netG(self.L_A)
-
-        # update hard_ratio
-        if (current_step - 1) % ((800 / self.batch_size) * 50) == 0:  # 200 steps is 1 epoch for div2k train and batch size of 4
-            print('increasing hard ratio')
-            self.hard_ratio += 1
 
         # calculate individual losses
         loss_E = self.G_lossfn(self.E, self.H)
@@ -270,15 +274,20 @@ class ModelPlainAug(ModelBase):
         AD_loss_aug = 0.5 * self.AD_lossfn(pred_fake, True)
 
         # augmentor loss
-        A_loss = loss_E_A + self.augmentation_wt * torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss_aug
+        A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) #+ AD_loss_aug
         # A_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss_aug
         # A_loss = torch.exp(-(loss_E_A - loss_E))  # extreme loss
         A_loss.backward(retain_graph=True)
         self.A_optimizer.step()
 
-        # optimize the augmentor's discriminator
+        # freezing the augmentor and discriminator graphs
+        for p in self.netA.parameters():
+            p.requires_grad = False
         for p in self.netAD.parameters():
             p.requires_grad = True
+        for p in self.netG.parameters():
+            p.requires_grad = False
+
         self.AD_optimizer.zero_grad()
         # real
         pred_d_real = self.netAD(self.L)
@@ -291,10 +300,16 @@ class ModelPlainAug(ModelBase):
         self.AD_optimizer.step()
 
         # optimize the generator (like this otherwise grads will be calculated for the Augmentor giving an error)
+        for p in self.netA.parameters():
+            p.requires_grad = False
+        for p in self.netAD.parameters():
+            p.requires_grad = False
         for p in self.netG.parameters():
             p.requires_grad = True
+
         self.G_optimizer.zero_grad()
-        G_loss = self.G_lossfn(self.E, self.H) / 2 + self.G_lossfn(self.netG(self.L_A.detach()), self.H) / 2
+        G_loss = self.G_lossfn(self.netG(self.L), self.H) + self.G_lossfn(self.netG(self.L_A.detach()), self.H)
+        G_loss = G_loss / 2
         G_loss.backward()
         # print(f'A after G back, should be unchanged: {self.netA.module.conv_last.weight[0][0][0].grad}')
         # print(f'G after G back, should be changed: {self.netG.module.conv_last.weight[0][0][0].grad}')
