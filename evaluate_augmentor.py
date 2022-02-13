@@ -192,10 +192,11 @@ def test_generator(device):
 
 
 if __name__ == '__main__':
-    test_generator = sys.argv[1]
+    mode = sys.argv[1]
     device = torch.device('cuda')
-    if test_generator:
+    if mode == '0':
+        compare_augmentor_models(device)
+    elif mode == '1':
         test_generator(device)
     else:
-        compare_augmentor_models(device)
-
+        raise ValueError
