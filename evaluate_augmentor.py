@@ -21,7 +21,7 @@ def compare_augmentor_models(device):
     # image paths
     paths = util.get_image_paths('/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR_randSample')
     # hr_steps = {1: 40000, 4: 65000, 16: 68000, 64: 72000, 256: 76000, 1024: 80000, 4096: 84000, 16384: 88000}
-    hr_steps = {'10k_hr1': 10_000, '20k_hr2': 20_000, '30k_hr3': 30_000, '40k_hr4': 40_000}
+    hr_steps = {'2k_hr1': 2_000, '5k_hr1': 5_000, '7k_hr2': 7_000, '10k_hr2': 10_000}
     dir = '/home/varun/sr/KAIR/aug_images'
     model_dir = '/home/varun/sr/KAIR/superresolution/aug_x4_rrdb/models'
 
@@ -62,7 +62,7 @@ def compare_augmentor_models(device):
             img_L = util.imresize_np(img_H, 1 / 4, True)
 
             # downsample with augmentor
-            imgt = util.uint2tensor4(img)
+            imgt = util.uint2tensor4(img).to(device)
             oom = False
             try:
                 with torch.no_grad():
@@ -76,7 +76,7 @@ def compare_augmentor_models(device):
             oom = False
             try:
                 with torch.no_grad():
-                    img_E = gen(util.single2tensor4(img_L))
+                    img_E = gen(util.single2tensor4(img_L).to(device))
                     img_E_A = gen(img_L_A)
             except RuntimeError:  # Out of memory
                 oom = True
