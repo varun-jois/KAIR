@@ -1,7 +1,7 @@
 {
   "task": "aug_x4_rrdb"     //  root/task/images|models|options     aug_x4_model or baseline_x4_model
   , "model": "plain_aug"           // "plain" | "plain2" if two inputs
-  , "gpu_ids": [1]             // [0,1,2,3] for 4 GPUs
+  , "gpu_ids": [1,2]             // [0,1,2,3] for 4 GPUs
   , "dist": true
 
   , "scale": 4       // broadcast to "datasets"
@@ -27,7 +27,7 @@
 
       , "dataloader_shuffle": true
       , "dataloader_num_workers": 8     // 8 | 32 | 64
-      , "dataloader_batch_size": 4      // batch size for all GPUs, 1 | 16 | 32 | 48 | 64 | 128
+      , "dataloader_batch_size": 8      // batch size for all GPUs, 1 | 16 | 32 | 48 | 64 | 128
     }
     , "test": {
       "name": "test_dataset"            // fixed
