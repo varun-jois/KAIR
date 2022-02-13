@@ -23,6 +23,7 @@ def compare_augmentor_models():
     # hr_steps = {1: 40000, 4: 65000, 16: 68000, 64: 72000, 256: 76000, 1024: 80000, 4096: 84000, 16384: 88000}
     hr_steps = {'10k_hr1': 10_000, '20k_hr2': 20_000, '30k_hr3': 30_000, '40k_hr4': 40_000}
     dir = '/home/varun/sr/KAIR/aug_images'
+    model_dir = '/home/varun/sr/KAIR/superresolution/aug_x4_rrdb/models'
 
     # the images to evaluate
     idx = range(3)  # np.random.randint(0, 10, 5)
@@ -32,13 +33,13 @@ def compare_augmentor_models():
         # load the augmentor
         model_name = f'{step}_A.pth'
         aug = RRDBNET_AUG()
-        state_dict = torch.load(os.path.join('/home/varun/sr/KAIR/superresolution/aug_x4_rrdb/models', model_name))
+        state_dict = torch.load(os.path.join(model_dir, model_name))
         aug.load_state_dict(state_dict)
 
         # load the generator
         model_name = f'{step}_G.pth'
         gen = RRDBNet()
-        state_dict = torch.load(os.path.join('/home/varun/sr/KAIR/superresolution/sraug_x4_psnr/models', model_name))
+        state_dict = torch.load(os.path.join(model_dir, model_name))
         gen.load_state_dict(state_dict)
         print('loaded model')
 
