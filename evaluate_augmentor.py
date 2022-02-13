@@ -191,6 +191,6 @@ def test_generator(device):
 
 
 if __name__ == '__main__':
-    device = torch.device('cuda')
+    device = torch.device('cpu')
     #compare_augmentor_models(device)
     test_generator(device)
