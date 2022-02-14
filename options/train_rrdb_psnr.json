@@ -68,7 +68,7 @@
     , "G_regularizer_clipstep": null    // unused
 
     , "checkpoint_test": 5000000           // for testing
-    , "checkpoint_save": 1000           // for saving model
+    , "checkpoint_save": 2500           // for saving model
     , "checkpoint_print": 5000000           // for print
   }
 }
