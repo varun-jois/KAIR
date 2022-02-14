@@ -22,7 +22,7 @@ def compare_augmentor_models(device):
     # image paths
     paths = util.get_image_paths('/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR_randSample')
     # hr_steps = {1: 40000, 4: 65000, 16: 68000, 64: 72000, 256: 76000, 1024: 80000, 4096: 84000, 16384: 88000}
-    hr_steps = {'2k_hr1': 2_000, '5k_hr1': 5_000, '7k_hr2': 7_000, '10k_hr2': 10_000}
+    hr_steps = {'150ep_hr1': 20_000, '200ep_hr1': 30_000}
     dir = '/home/varun/sr/KAIR/aug_images'
     model_dir = '/home/varun/sr/KAIR/superresolution/aug_x4_rrdb/models'
 
