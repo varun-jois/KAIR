@@ -130,11 +130,100 @@ def compare_with_JPEG(hard_ratio, quality_factor=90):
     print(f'Average psnr: {sum(psnrs) / len(psnrs)}')
 
 
-def test_generator(device):
+def test_augmentor(device, model_name):
+    # image paths
+    paths = util.get_image_paths('/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR_randSample')
+    dir = '/home/varun/sr/KAIR/aug_images'
+    model_dir = f'/home/varun/sr/KAIR/superresolution/{model_name}/models'
+
+    # load the aug model
+    init_iter_A, init_path_A = option.find_last_checkpoint(model_dir, net_type='A')
+    aug = RRDBNET_AUG()
+    aug = aug.to(device)
+    state_dict = torch.load(init_path_A)
+    aug.load_state_dict(state_dict)
+    aug.eval()
+    print('loaded augmentor')
+
+    # load the gen model
+    init_iter_G, init_path_G = option.find_last_checkpoint(model_dir, net_type='G')
+    gen = RRDBNet()
+    gen = gen.to(device)
+    state_dict = torch.load(init_path_G)
+    gen.load_state_dict(state_dict)
+    gen.eval()
+    print('loaded generator')
+
+    # the images to evaluate
+    idx = range(10)  # np.random.randint(0, 10, 5)
+
+    for i in idx:
+        # pick a random pic
+        H_path = paths[i]
+        img_name = Path(H_path).stem
+        img = util.imread_uint(H_path,
+                               3)  # or manually set path   '/home/varun/PhD/super_resolution/vrj_data/div2k_0112.png'
+        img = util.modcrop(img, 4)
+        img_H = util.uint2single(img)
+
+        # use matlab's bicubic downsampling
+        img_L = util.imresize_np(img_H, 1 / 4, True)
+
+        # downsample with augmentor
+        imgt = util.uint2tensor4(img).to(device)
+        oom = False
+        try:
+            with torch.no_grad():
+                img_L_A = aug(imgt)
+        except RuntimeError:  # Out of memory
+            oom = True
+        if oom:
+            continue
+
+        # evaluate generator for bicubic and augmentor data
+        oom = False
+        try:
+            with torch.no_grad():
+                img_E = gen(util.single2tensor4(img_L).to(device))
+                img_E_A = gen(img_L_A)
+        except RuntimeError:  # Out of memory
+            oom = True
+        if oom:
+            print(f'Failed to generate image.')
+            continue
+
+        # convert back to uint and save
+        img_L = util.single2uint(img_L)
+        img_L_A = util.tensor2uint(img_L_A)
+        img_E = util.tensor2uint(img_E)
+        img_E_A = util.tensor2uint(img_E_A)
+
+        # calculate psnr
+        psnr = round(util.calculate_psnr(img_L, img_L_A), 2)
+        psnr_E = round(util.calculate_psnr(img_E, img), 2)
+        psnr_E_A = round(util.calculate_psnr(img_E_A, img), 2)
+
+        # save image
+        final = np.concatenate((img_L, img_L_A), axis=1)
+        file = os.path.join(dir, f'{img_name}_{psnr}.png')
+        util.imwrite(final, file)
+
+        file = os.path.join(dir, f'{img_name}_{psnr_E}_E.png')
+        util.imwrite(img_E, file)
+
+        file = os.path.join(dir, f'{img_name}_{psnr_E_A}_E_A.png')
+        util.imwrite(img_E_A, file)
+
+        # save the original HR image
+        # file = os.path.join(folder, f'{img_name}.png')
+        # util.imwrite(img, file)
+
+
+def test_generator(device, model_name):
     # image paths
     paths = util.get_image_paths('/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR_randSample')
     dir = '/home/varun/sr/KAIR/gen_images'
-    model_dir = '/home/varun/sr/KAIR/superresolution/baseline_x4_rrdb/models'
+    model_dir = f'/home/varun/sr/KAIR/superresolution/{model_name}/models'
 
     # load the model
     init_iter_G, init_path_G = option.find_last_checkpoint(model_dir, net_type='G')
@@ -142,10 +231,11 @@ def test_generator(device):
     gen = gen.to(device)
     state_dict = torch.load(init_path_G)
     gen.load_state_dict(state_dict)
+    gen.eval()
     print('loaded model')
 
     # the images to evaluate
-    idx = range(3)  # np.random.randint(0, 10, 5)
+    idx = range(10)  # np.random.randint(0, 10, 5)
 
     for i in idx:
         # pick a random pic
@@ -193,10 +283,11 @@ def test_generator(device):
 
 if __name__ == '__main__':
     mode = sys.argv[1]
+    model_name = sys.argv[2]
     device = torch.device('cuda')
     if mode == '0':
-        compare_augmentor_models(device)
+        test_augmentor(device, model_name)
     elif mode == '1':
-        test_generator(device)
+        test_generator(device, model_name)
     else:
         raise ValueError
