@@ -37,6 +37,7 @@ def main(model_names):
     results = {m: {t: {x: 0 for x in METRICS} for t in TESTSETS} for m in model_names}
 
     for m in model_names:
+        print(f'Starting testing for {m}')
 
         # load model
         if 'rrdb' in m:
@@ -79,7 +80,7 @@ def main(model_names):
                 img_E = util.tensor2uint(img_E)
 
                 # load the HR image
-                img_H_path = os.path.join(H_path_dir, f'{name}.png')
+                img_H_path = os.path.join(H_path_dir, f'{name[:-2]}.png')
                 img_H = util.imread_uint(img_H_path, 3)
 
                 # calculate the metrics
@@ -89,6 +90,7 @@ def main(model_names):
             # store the results
             results[m][t]['psnr'] = psnr_total / len(L_paths)
             results[m][t]['ssim'] = ssim_total / len(L_paths)
+            print(f'\t\tFinished {t}')
 
     # save the results
     df = pd.concat({k: pd.DataFrame.from_dict(v, 'index') for k, v in results.items()}, axis=1).T
