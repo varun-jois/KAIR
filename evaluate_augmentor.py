@@ -15,6 +15,7 @@ from models.network_rrdbnet_augmentor import RRDBNET_AUG
 from models.network_rrdbnet import RRDBNet
 import matplotlib.pyplot as plt
 import utils.utils_image as util
+from utils import utils_option as option
 
 
 def compare_augmentor_models(device):
@@ -132,15 +133,14 @@ def compare_with_JPEG(hard_ratio, quality_factor=90):
 def test_generator(device):
     # image paths
     paths = util.get_image_paths('/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR_randSample')
-    step = 10_000
     dir = '/home/varun/sr/KAIR/gen_images'
     model_dir = '/home/varun/sr/KAIR/superresolution/baseline_x4_rrdb/models'
 
     # load the model
-    model_name = f'{step}_G.pth'
+    init_iter_G, init_path_G = option.find_last_checkpoint(model_dir, net_type='G')
     gen = RRDBNet()
     gen = gen.to(device)
-    state_dict = torch.load(os.path.join(model_dir, model_name))
+    state_dict = torch.load(init_path_G)
     gen.load_state_dict(state_dict)
     print('loaded model')
 
