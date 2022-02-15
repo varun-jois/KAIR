@@ -221,15 +221,20 @@ def test_augmentor(device, model_name):
 
 def test_generator(device, model_name):
     # image paths
-    paths = util.get_image_paths('/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR_randSample')
+    #paths = util.get_image_paths('/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR_randSample')
+    paths = util.get_image_paths('/home/varun/sr/datasets/misc')
     dir = '/home/varun/sr/KAIR/gen_images'
     model_dir = f'/home/varun/sr/KAIR/superresolution/{model_name}/models'
 
     # load the model
-    init_iter_G, init_path_G = option.find_last_checkpoint(model_dir, net_type='G')
+    # try to get the E model otherwise G
+    _, init_path = option.find_last_checkpoint(model_dir, net_type='E')
+    if init_path is None:
+        _, init_path = option.find_last_checkpoint(model_dir, net_type='G')
+        print('Loaded the G model')
     gen = RRDBNet()
     gen = gen.to(device)
-    state_dict = torch.load(init_path_G)
+    state_dict = torch.load(init_path)
     gen.load_state_dict(state_dict)
     gen.eval()
     print('loaded model')
@@ -249,6 +254,9 @@ def test_generator(device, model_name):
         # use matlab's bicubic downsampling
         img_L = util.imresize_np(img_H, 1 / 4, True)
 
+        # get the output of bicubic upsampling
+        img_B = util.imresize_np(img_L, 4, True)
+
         # evaluate generator for bicubic and augmentor data
         oom = False
         try:
@@ -262,17 +270,30 @@ def test_generator(device, model_name):
 
         # convert back to uint and save
         img_L = util.single2uint(img_L)
+        img_B = util.single2uint(img_B)
         img_E = util.tensor2uint(img_E)
 
         # calculate psnr
         psnr_E = round(util.calculate_psnr(img_E, img), 2)
+        psnr_B = round(util.calculate_psnr(img_B, img), 2)
 
         # save image
         file = os.path.join(dir, f'{img_name}_L.png')
         util.imwrite(img_L, file)
 
+        # one file with all three
+        file = os.path.join(dir, f'{img_name}_BEH.png')
+        three = np.concatenate((img_B, img_E, img), axis=1)
+        util.imwrite(three, file)
+
+        file = os.path.join(dir, f'{img_name}_{psnr_B}_B.png')
+        util.imwrite(img_B, file)
+
         file = os.path.join(dir, f'{img_name}_{psnr_E}_E.png')
         util.imwrite(img_E, file)
+
+        file = os.path.join(dir, f'{img_name}_{psnr_E}_H.png')
+        util.imwrite(img, file)
 
         # save the original HR image
         # file = os.path.join(folder, f'{img_name}.png')
