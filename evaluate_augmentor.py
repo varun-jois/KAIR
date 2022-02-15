@@ -16,6 +16,7 @@ from models.network_rrdbnet import RRDBNet
 import matplotlib.pyplot as plt
 import utils.utils_image as util
 from utils import utils_option as option
+import glob
 
 
 def compare_augmentor_models(device):
@@ -240,7 +241,7 @@ def test_generator(device, model_name):
     print('loaded model')
 
     # the images to evaluate
-    idx = range(10)  # np.random.randint(0, 10, 5)
+    idx = range(3)  # np.random.randint(0, 10, 5)
 
     for i in idx:
         # pick a random pic
