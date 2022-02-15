@@ -1,7 +1,7 @@
 {
-  "task": "aug_x4_rrdb"     //  root/task/images|models|options     aug_x4_model or baseline_x4_model
+  "task": "aug_x4_rrdb_t"     //  root/task/images|models|options     aug_x4_model or baseline_x4_model
   , "model": "plain_aug"           // "plain" | "plain2" if two inputs
-  , "gpu_ids": [2]             // [0,1,2,3] for 4 GPUs
+  , "gpu_ids": [1]             // [0,1,2,3] for 4 GPUs
   , "dist": true
 
   , "scale": 4       // broadcast to "datasets"
