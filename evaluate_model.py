@@ -83,6 +83,9 @@ def main(model_names):
                 img_H_path = os.path.join(H_path_dir, f'{name[:-2]}.png')
                 img_H = util.imread_uint(img_H_path, 3)
 
+                print(f'E shape {img_E.shape}')
+                print(f'E shape {img_H.shape}')
+
                 # calculate the metrics
                 psnr_total += util.calculate_psnr(img_E, img_H, border=border)
                 ssim_total += util.calculate_ssim(img_E, img_H, border=border)
