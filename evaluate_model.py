@@ -51,7 +51,7 @@ def main(model_names):
 
         # get scaling factor
         sf = m.split('_')[1].upper()
-        border = sf  # shave boader to calculate PSNR and SSIM
+        border = int(sf)  # shave boader to calculate PSNR and SSIM
 
         for t in TESTSETS:
             # the paths for the images
