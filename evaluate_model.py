@@ -45,8 +45,12 @@ def main(model_names):
         else:
             gen = RRDBNet()
         gen = gen.to(device)
-        init_iter_G, init_path_G = option.find_last_checkpoint(os.path.join(MODEL_DIR, m, 'models'), net_type='G')
-        gen.load_state_dict(torch.load(init_path_G), strict=True)
+        # try to get the E model other wise G
+        _, init_path = option.find_last_checkpoint(os.path.join(MODEL_DIR, m, 'models'), net_type='E')
+        if init_path is None:
+            _, init_path = option.find_last_checkpoint(os.path.join(MODEL_DIR, m, 'models'), net_type='G')
+            print('Loaded the G model')
+        gen.load_state_dict(torch.load(init_path), strict=True)
         gen.eval()
 
         # get scaling factor
