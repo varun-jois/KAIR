@@ -255,10 +255,10 @@ class ModelPlainAug(ModelBase):
 
 
         # update hard_ratio
-        epoch_to_update = 5000000
-        if (current_step - 1) % ((800 / self.batch_size) * epoch_to_update) == 0:  # 200 steps is 1 epoch for div2k train and batch size of 4
-            print('increasing hard ratio')
-            self.hard_ratio += 1
+        # epoch_to_update = 5000000
+        # if (current_step - 1) % ((800 / self.batch_size) * epoch_to_update) == 0:  # 200 steps is 1 epoch for div2k train and batch size of 4
+        #     print('increasing hard ratio')
+        #     self.hard_ratio += 1
 
         self.A_optimizer.zero_grad()
         self.L_A = self.netA(self.H)
