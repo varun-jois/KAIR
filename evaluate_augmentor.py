@@ -293,7 +293,7 @@ def test_generator(device, model_name):
         file = os.path.join(dir, f'{img_name}_{psnr_E}_E.png')
         util.imwrite(img_E, file)
 
-        file = os.path.join(dir, f'{img_name}_{psnr_E}_H.png')
+        file = os.path.join(dir, f'{img_name}_H.png')
         util.imwrite(img, file)
 
         # save the original HR image
