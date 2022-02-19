@@ -60,10 +60,11 @@ class ModelPlainAug(ModelBase):
         self.log_dict['G_loss_epoch'] = 0
         self.log_dict['A_loss_epoch'] = 0
         self.log_dict['G_loss_epoch'] = 0
-        self.log_dict['AD_loss_epoch'] = 0
-        self.log_dict['AD_loss_aug'] = 0
-        self.log_dict['l_d_real'] = 0
-        self.log_dict['l_d_fake'] = 0
+        self.log_dict['F_loss_epoch'] = 0
+        # self.log_dict['AD_loss_epoch'] = 0
+        # self.log_dict['AD_loss_aug'] = 0
+        # self.log_dict['l_d_real'] = 0
+        # self.log_dict['l_d_fake'] = 0
 
     # ----------------------------------------
     # load pre-trained G model
@@ -276,8 +277,11 @@ class ModelPlainAug(ModelBase):
         # pred_fake = self.netAD(self.L_A)
         # AD_loss_aug = 0.5 * self.AD_lossfn(pred_fake, True)
 
+        # Perceptual loss
+        F_loss = self.F_lossfn(self.L_A, self.L)
+
         # augmentor loss
-        A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + self.F_lossfn(self.L_A, self.L)
+        A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + F_loss
         # A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss_aug
         # A_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss_aug
         # A_loss = torch.exp(-(loss_E_A - loss_E))  # extreme loss
@@ -341,10 +345,12 @@ class ModelPlainAug(ModelBase):
         # self.log_dict['G_loss'] = G_loss.item()/self.E.size()[0]  # if `reduction='sum'`
         self.log_dict['G_loss'] = G_loss.item()
         self.log_dict['A_loss'] = A_loss.item()
+        self.log_dict['F_loss'] = F_loss.item()
         # self.log_dict['AD_loss'] = AD_loss.item()
 
         self.log_dict['G_loss_epoch'] += G_loss.item()
         self.log_dict['A_loss_epoch'] += A_loss.item()
+        self.log_dict['F_loss_epoch'] += A_loss.item()
         # self.log_dict['AD_loss_epoch'] += AD_loss.item()
         # self.log_dict['AD_loss_aug'] += AD_loss_aug.item()
         # self.log_dict['l_d_real'] += l_d_real.item()
@@ -388,7 +394,7 @@ class ModelPlainAug(ModelBase):
     # get epoch_stats
     # ----------------------------------------
     def get_epoch_stats(self):
-        s = {'G_loss_epoch', 'A_loss_epoch', 'AD_loss_epoch', 'AD_loss_aug', 'l_d_real', 'l_d_fake'}
+        s = {'G_loss_epoch', 'A_loss_epoch', 'F_loss_epoch', 'AD_loss_epoch', 'AD_loss_aug', 'l_d_real', 'l_d_fake'}
         subset = {k: v for k, v in self.log_dict.items() if k in s}
         subset['hard_ratio'] = self.hard_ratio
         # message = ' '.join([f'{k:s}:{v:.3e}' for k, v in subset.items()])
