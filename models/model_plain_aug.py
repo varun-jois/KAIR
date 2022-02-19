@@ -6,7 +6,7 @@ from torch.optim import Adam
 
 from models.select_network import define_G, define_A, define_D
 from models.model_base import ModelBase
-from models.loss import CharbonnierLoss, GANLoss
+from models.loss import CharbonnierLoss, GANLoss, PerceptualLoss
 from models.loss_ssim import SSIMLoss
 
 from utils.utils_model import test_mode
@@ -29,8 +29,8 @@ class ModelPlainAug(ModelBase):
         self.netG = self.model_to_device(self.netG)
         self.netA = define_A(opt)
         self.netA = self.model_to_device(self.netA)
-        self.netAD = define_D(opt)
-        self.netAD = self.model_to_device(self.netAD)
+        # self.netAD = define_D(opt)
+        # self.netAD = self.model_to_device(self.netAD)
         self.hard_ratio = opt['train']['hard_ratio_start']
         self.augmentation_wt = 1
         self.batch_size = opt['datasets']['train']['dataloader_batch_size']
@@ -51,7 +51,7 @@ class ModelPlainAug(ModelBase):
         self.load()                           # load model
         self.netG.train()                     # set training mode,for BN
         self.netA.train()
-        self.netAD.train()
+        # self.netAD.train()
         self.define_loss()                    # define loss
         self.define_optimizer()               # define optimizer
         self.load_optimizers()                # load optimizer
@@ -79,10 +79,10 @@ class ModelPlainAug(ModelBase):
             print('Loading model for A [{:s}] ...'.format(load_path_A))
             self.load_network(load_path_A, self.netA, strict=self.opt_train['A_param_strict'], param_key='params')
 
-        load_path_AD = self.opt['path']['pretrained_netAD']
-        if load_path_AD is not None:
-            print('Loading model for AD [{:s}] ...'.format(load_path_AD))
-            self.load_network(load_path_AD, self.netAD, strict=self.opt_train['AD_param_strict'], param_key='params')
+        # load_path_AD = self.opt['path']['pretrained_netAD']
+        # if load_path_AD is not None:
+        #     print('Loading model for AD [{:s}] ...'.format(load_path_AD))
+        #     self.load_network(load_path_AD, self.netAD, strict=self.opt_train['AD_param_strict'], param_key='params')
 
         load_path_E = self.opt['path']['pretrained_netE']
         if self.opt_train['E_decay'] > 0:
@@ -108,10 +108,10 @@ class ModelPlainAug(ModelBase):
             print('Loading optimizerA [{:s}] ...'.format(load_path_optimizerA))
             self.load_optimizer(load_path_optimizerA, self.A_optimizer)
 
-        load_path_optimizerAD = self.opt['path']['pretrained_optimizerAD']
-        if load_path_optimizerAD is not None and self.opt_train['AD_optimizer_reuse']:
-            print('Loading optimizerAD [{:s}] ...'.format(load_path_optimizerAD))
-            self.load_optimizer(load_path_optimizerAD, self.AD_optimizer)
+        # load_path_optimizerAD = self.opt['path']['pretrained_optimizerAD']
+        # if load_path_optimizerAD is not None and self.opt_train['AD_optimizer_reuse']:
+        #     print('Loading optimizerAD [{:s}] ...'.format(load_path_optimizerAD))
+        #     self.load_optimizer(load_path_optimizerAD, self.AD_optimizer)
 
     # ----------------------------------------
     # save model / optimizer(optional)
@@ -119,15 +119,15 @@ class ModelPlainAug(ModelBase):
     def save(self, iter_label):
         self.save_network(self.save_dir, self.netG, 'G', iter_label)
         self.save_network(self.save_dir, self.netA, 'A', iter_label)
-        self.save_network(self.save_dir, self.netAD, 'AD', iter_label)
+        # self.save_network(self.save_dir, self.netAD, 'AD', iter_label)
         if self.opt_train['E_decay'] > 0:
             self.save_network(self.save_dir, self.netE, 'E', iter_label)
         if self.opt_train['G_optimizer_reuse']:
             self.save_optimizer(self.save_dir, self.G_optimizer, 'optimizerG', iter_label)
         if self.opt_train['A_optimizer_reuse']:
             self.save_optimizer(self.save_dir, self.A_optimizer, 'optimizerA', iter_label)
-        if self.opt_train['AD_optimizer_reuse']:
-            self.save_optimizer(self.save_dir, self.AD_optimizer, 'optimizerAD', iter_label)
+        # if self.opt_train['AD_optimizer_reuse']:
+        #     self.save_optimizer(self.save_dir, self.AD_optimizer, 'optimizerAD', iter_label)
 
     # ----------------------------------------
     # define loss
@@ -149,19 +149,22 @@ class ModelPlainAug(ModelBase):
         self.G_lossfn_weight = self.opt_train['G_lossfn_weight']
 
         # augmentor loss
-        def augmentor_loss(E, E_A, H):
-            loss_E = self.G_lossfn(E, H)
-            loss_E_A = self.G_lossfn(E_A, H)
-            aug_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E))
-            loss = loss_E_A + self.augmentation_wt * aug_loss
-            return loss
-        self.A_lossfn = augmentor_loss
+        # def augmentor_loss(E, E_A, H):
+        #     loss_E = self.G_lossfn(E, H)
+        #     loss_E_A = self.G_lossfn(E_A, H)
+        #     aug_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E))
+        #     loss = loss_E_A + self.augmentation_wt * aug_loss
+        #     return loss
+        # self.A_lossfn = augmentor_loss
+
+        # perceptual loss for augmentor
+        self.F_lossfn = PerceptualLoss().to(self.device)
 
         # augmentor's discriminator loss
-        self.AD_lossfn = GANLoss(self.opt_train['gan_type'], 1.0, 0.0).to(self.device)
-        self.AD_lossfn_weight = self.opt_train['AD_lossfn_weight']
-        self.AD_update_ratio = self.opt_train['AD_update_ratio'] if self.opt_train['AD_update_ratio'] else 1
-        self.AD_init_iters = self.opt_train['AD_init_iters'] if self.opt_train['AD_init_iters'] else 0
+        # self.AD_lossfn = GANLoss(self.opt_train['gan_type'], 1.0, 0.0).to(self.device)
+        # self.AD_lossfn_weight = self.opt_train['AD_lossfn_weight']
+        # self.AD_update_ratio = self.opt_train['AD_update_ratio'] if self.opt_train['AD_update_ratio'] else 1
+        # self.AD_init_iters = self.opt_train['AD_init_iters'] if self.opt_train['AD_init_iters'] else 0
 
     # ----------------------------------------
     # define optimizer
@@ -185,13 +188,13 @@ class ModelPlainAug(ModelBase):
         self.A_optimizer = Adam(A_optim_params, lr=self.opt_train['A_optimizer_lr'], weight_decay=0)
 
         # optimizer for the augmentor's discriminator
-        AD_optim_params = []
-        for k, v in self.netAD.named_parameters():
-            if v.requires_grad:
-                AD_optim_params.append(v)
-            else:
-                print('Params [{:s}] will not optimize.'.format(k))
-        self.AD_optimizer = Adam(AD_optim_params, lr=self.opt_train['AD_optimizer_lr'], weight_decay=0)
+        # AD_optim_params = []
+        # for k, v in self.netAD.named_parameters():
+        #     if v.requires_grad:
+        #         AD_optim_params.append(v)
+        #     else:
+        #         print('Params [{:s}] will not optimize.'.format(k))
+        # self.AD_optimizer = Adam(AD_optim_params, lr=self.opt_train['AD_optimizer_lr'], weight_decay=0)
 
     # ----------------------------------------
     # define scheduler, only "MultiStepLR"
@@ -208,10 +211,10 @@ class ModelPlainAug(ModelBase):
                                                         ))
 
         # scheduler for the augmentor's discriminator
-        self.schedulers.append(lr_scheduler.MultiStepLR(self.AD_optimizer,
-                                                        self.opt_train['AD_scheduler_milestones'],
-                                                        self.opt_train['AD_scheduler_gamma']
-                                                        ))
+        # self.schedulers.append(lr_scheduler.MultiStepLR(self.AD_optimizer,
+        #                                                 self.opt_train['AD_scheduler_milestones'],
+        #                                                 self.opt_train['AD_scheduler_gamma']
+        #                                                 ))
     """
     # ----------------------------------------
     # Optimization during training with data
@@ -248,8 +251,8 @@ class ModelPlainAug(ModelBase):
         # freezing the generator and discriminator graphs
         for p in self.netA.parameters():
             p.requires_grad = True
-        for p in self.netAD.parameters():
-            p.requires_grad = False
+        # for p in self.netAD.parameters():
+        #     p.requires_grad = False
         for p in self.netG.parameters():
             p.requires_grad = False
 
@@ -270,40 +273,41 @@ class ModelPlainAug(ModelBase):
         loss_E_A = self.G_lossfn(self.E_A, self.H)
 
         # get the loss from the discriminator
-        pred_fake = self.netAD(self.L_A)
-        AD_loss_aug = 0.5 * self.AD_lossfn(pred_fake, True)
+        # pred_fake = self.netAD(self.L_A)
+        # AD_loss_aug = 0.5 * self.AD_lossfn(pred_fake, True)
 
         # augmentor loss
-        A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss_aug
+        A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + self.F_lossfn(self.L_A, self.L)
+        # A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss_aug
         # A_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss_aug
         # A_loss = torch.exp(-(loss_E_A - loss_E))  # extreme loss
         A_loss.backward(retain_graph=True)
         self.A_optimizer.step()
 
         # freezing the augmentor and discriminator graphs
-        for p in self.netA.parameters():
-            p.requires_grad = False
-        for p in self.netAD.parameters():
-            p.requires_grad = True
-        for p in self.netG.parameters():
-            p.requires_grad = False
-
-        self.AD_optimizer.zero_grad()
-        # real
-        pred_d_real = self.netAD(self.L)
-        l_d_real = 0.5 * self.AD_lossfn(pred_d_real, True)
-        # fake
-        pred_d_fake = self.netAD(self.L_A.detach())  # 2) fake data, detach to avoid BP to G
-        l_d_fake = 0.5 * self.AD_lossfn(pred_d_fake, False)
-        AD_loss = l_d_real + l_d_fake
-        AD_loss.backward()
-        self.AD_optimizer.step()
+        # for p in self.netA.parameters():
+        #     p.requires_grad = False
+        # for p in self.netAD.parameters():
+        #     p.requires_grad = True
+        # for p in self.netG.parameters():
+        #     p.requires_grad = False
+        #
+        # self.AD_optimizer.zero_grad()
+        # # real
+        # pred_d_real = self.netAD(self.L)
+        # l_d_real = 0.5 * self.AD_lossfn(pred_d_real, True)
+        # # fake
+        # pred_d_fake = self.netAD(self.L_A.detach())  # 2) fake data, detach to avoid BP to G
+        # l_d_fake = 0.5 * self.AD_lossfn(pred_d_fake, False)
+        # AD_loss = l_d_real + l_d_fake
+        # AD_loss.backward()
+        # self.AD_optimizer.step()
 
         # optimize the generator (like this otherwise grads will be calculated for the Augmentor giving an error)
         for p in self.netA.parameters():
             p.requires_grad = False
-        for p in self.netAD.parameters():
-            p.requires_grad = False
+        # for p in self.netAD.parameters():
+        #     p.requires_grad = False
         for p in self.netG.parameters():
             p.requires_grad = True
 
@@ -337,14 +341,14 @@ class ModelPlainAug(ModelBase):
         # self.log_dict['G_loss'] = G_loss.item()/self.E.size()[0]  # if `reduction='sum'`
         self.log_dict['G_loss'] = G_loss.item()
         self.log_dict['A_loss'] = A_loss.item()
-        self.log_dict['AD_loss'] = AD_loss.item()
+        # self.log_dict['AD_loss'] = AD_loss.item()
 
         self.log_dict['G_loss_epoch'] += G_loss.item()
         self.log_dict['A_loss_epoch'] += A_loss.item()
-        self.log_dict['AD_loss_epoch'] += AD_loss.item()
-        self.log_dict['AD_loss_aug'] += AD_loss_aug.item()
-        self.log_dict['l_d_real'] += l_d_real.item()
-        self.log_dict['l_d_fake'] += l_d_fake.item()
+        # self.log_dict['AD_loss_epoch'] += AD_loss.item()
+        # self.log_dict['AD_loss_aug'] += AD_loss_aug.item()
+        # self.log_dict['l_d_real'] += l_d_real.item()
+        # self.log_dict['l_d_fake'] += l_d_fake.item()
 
         self.log_dict['hard_ratio'] = self.hard_ratio
 
@@ -388,7 +392,7 @@ class ModelPlainAug(ModelBase):
         subset = {k: v for k, v in self.log_dict.items() if k in s}
         subset['hard_ratio'] = self.hard_ratio
         # message = ' '.join([f'{k:s}:{v:.3e}' for k, v in subset.items()])
-        for k in s:
+        for k in subset:
             self.log_dict[k] = 0
         return subset
 
