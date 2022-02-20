@@ -142,7 +142,7 @@ def test_augmentor(device, model_name):
     aug = RRDBNET_AUG()
     aug = aug.to(device)
     state_dict = torch.load(init_path_A)
-    aug.load_state_dict(state_dict)
+    aug.load_state_dict(state_dict, strict=False)
     aug.eval()
     print('loaded augmentor')
 
