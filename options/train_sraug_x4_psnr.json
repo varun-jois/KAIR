@@ -59,14 +59,14 @@
     , "init_gain": 0.2
   }
   , "netA": {
-    "net_type": "simple"  // "rrdbnet" | "simple"
+    "net_type": "rrdbnet"  // "rrdbnet" | "simple"
     , "in_nc": 3        // input channel number
     , "out_nc": 3       // ouput channel number
     , "nf": 64          // 96 for DPSR, 128 for SRMD, 64 for "dncnn"
     , "gc": 32          //
     , "nb1": 1          // number of residual blocks before the first max pooling layer
     , "nb2": 1          // number of residual blocks before the second max pooling layer
-    , "nb3": 10         // number of residual blocks after the second max pooling layer
+    , "nb3": 1         // number of residual blocks after the second max pooling layer
     , "ng": 2           // unused
     , "reduction" : 16  // unused
     , "act_mode": "L"   // unused for now "BR" for BN+ReLU | "R" for ReLU
