@@ -38,7 +38,7 @@ def compare_augmentor_models(device, model_name):
         aug = RRDBNET_AUG()
         aug = aug.to(device)
         state_dict = torch.load(os.path.join(model_dir, model_name))
-        aug.load_state_dict(state_dict)
+        aug.load_state_dict(state_dict, strict=False)
 
         # load the generator
         model_name = f'{step}_G.pth'
