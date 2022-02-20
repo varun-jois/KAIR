@@ -279,7 +279,8 @@ def main(json_path='options/train_msrresnet_psnr.json'):
         # get epoch level data
         epoch_stats = model.get_epoch_stats()
         s = len(train_loader)
-        message = ' '.join([f'{k:s}:{v / s:.3e}' for k, v in epoch_stats.items() if k != 'hard_ratio'])
+        message = f'{epoch} '
+        message += ' '.join([f'{k:s}:{v / s:.3e}' for k, v in epoch_stats.items() if k != 'hard_ratio'])
         if 'hard_ratio' in epoch_stats:
             message += f" hard_ratio:{epoch_stats['hard_ratio']:.3e}"
         logger.info(message)
