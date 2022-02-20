@@ -259,7 +259,7 @@ class ModelPlainAug(ModelBase):
 
 
         # update hard_ratio
-        epoch_to_update = 10
+        epoch_to_update = 5
         if (current_step - 1) % ((800 / self.batch_size) * epoch_to_update) == 0:  # 200 steps is 1 epoch for div2k train and batch size of 4
             self.hard_ratio *= 2
             print(f'increased hard ratio to {self.hard_ratio}')
