@@ -259,7 +259,7 @@ class ModelPlainAug(ModelBase):
 
 
         # update hard_ratio
-        epoch_to_update = 40
+        epoch_to_update = 25
         if (current_step - 1) % ((800 / self.batch_size) * epoch_to_update) == 0:  # 200 steps is 1 epoch for div2k train and batch size of 4
             self.hard_ratio *= 2
             print(f'increased hard ratio to {self.hard_ratio}')
@@ -281,9 +281,9 @@ class ModelPlainAug(ModelBase):
         F_loss = self.F_lossfn(self.L_A, self.L)
 
         # augmentor loss
-        A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + F_loss
+        # A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + F_loss
         # A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss_aug
-        # A_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss_aug
+        A_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + F_loss
         # A_loss = torch.exp(-(loss_E_A - loss_E))  # extreme loss
         A_loss.backward(retain_graph=True)
         self.A_optimizer.step()
