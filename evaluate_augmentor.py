@@ -140,7 +140,7 @@ def test_augmentor(device, model_name):
 
     # load the aug model
     init_iter_A, init_path_A = option.find_last_checkpoint(model_dir, net_type='A')
-    aug = RRDBNET_AUG()
+    aug = RRDBNET_AUG(nb3=3)
     aug = aug.to(device)
     state_dict = torch.load(init_path_A)
     aug.load_state_dict(state_dict)
