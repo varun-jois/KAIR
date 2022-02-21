@@ -3,6 +3,7 @@ import imageio as iio
 import numpy as np
 import torch
 import math
+from models.loss import PerceptualLoss
 
 
 def loss1(lea, hr):
@@ -25,3 +26,5 @@ noise = lambda h: np.random.randint(0, 256, size=h.shape) / 255
 print(f'L1 loss with noise {np.abs(noise(h) - h).mean()}')
 print(f'L1 loss with zeros {np.abs(np.zeros(h.shape) - h).mean()}')
 print(f'L1 loss with ones {np.abs(np.ones(h.shape) - h).mean()}')
+
+pl = PerceptualLoss(feature_layer=34)
