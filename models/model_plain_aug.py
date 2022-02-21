@@ -60,7 +60,7 @@ class ModelPlainAug(ModelBase):
         self.log_dict['G_loss_epoch'] = 0
         self.log_dict['A_loss_epoch'] = 0
         self.log_dict['G_loss_epoch'] = 0
-        self.log_dict['F_loss_epoch'] = 0
+        # self.log_dict['F_loss_epoch'] = 0
         # self.log_dict['AD_loss_epoch'] = 0
         # self.log_dict['AD_loss_aug'] = 0
         # self.log_dict['l_d_real'] = 0
@@ -259,7 +259,7 @@ class ModelPlainAug(ModelBase):
 
 
         # update hard_ratio
-        epoch_to_update = 50
+        epoch_to_update = 25
         if (current_step - 1) % ((800 / self.batch_size) * epoch_to_update) == 0:  # 200 steps is 1 epoch for div2k train and batch size of 4
             self.hard_ratio *= 2
             print(f'increased hard ratio to {self.hard_ratio}')
@@ -278,12 +278,12 @@ class ModelPlainAug(ModelBase):
         # AD_loss_aug = 0.5 * self.AD_lossfn(pred_fake, True)
 
         # Perceptual loss
-        F_loss = self.F_lossfn(self.L_A, self.L)
+        # F_loss = self.F_lossfn(self.L_A, self.L)
 
         # augmentor loss
-        # A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + F_loss
+        A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E))
         # A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss_aug
-        A_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + F_loss
+        # A_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + F_loss
         # A_loss = torch.exp(-(loss_E_A - loss_E))  # extreme loss
         A_loss.backward(retain_graph=True)
         self.A_optimizer.step()
@@ -345,12 +345,12 @@ class ModelPlainAug(ModelBase):
         # self.log_dict['G_loss'] = G_loss.item()/self.E.size()[0]  # if `reduction='sum'`
         self.log_dict['G_loss'] = G_loss.item()
         self.log_dict['A_loss'] = A_loss.item()
-        self.log_dict['F_loss'] = F_loss.item()
+        # self.log_dict['F_loss'] = F_loss.item()
         # self.log_dict['AD_loss'] = AD_loss.item()
 
         self.log_dict['G_loss_epoch'] += G_loss.item()
         self.log_dict['A_loss_epoch'] += A_loss.item()
-        self.log_dict['F_loss_epoch'] += F_loss.item()
+        # self.log_dict['F_loss_epoch'] += F_loss.item()
         # self.log_dict['AD_loss_epoch'] += AD_loss.item()
         # self.log_dict['AD_loss_aug'] += AD_loss_aug.item()
         # self.log_dict['l_d_real'] += l_d_real.item()
