@@ -60,7 +60,7 @@ class ModelPlainAug(ModelBase):
         self.log_dict['G_loss_epoch'] = 0
         self.log_dict['A_loss_epoch'] = 0
         self.log_dict['G_loss_epoch'] = 0
-        self.log_dict['F_loss_epoch'] = 0
+        # self.log_dict['F_loss_epoch'] = 0
         # self.log_dict['AD_loss_epoch'] = 0
         # self.log_dict['AD_loss_aug'] = 0
         # self.log_dict['l_d_real'] = 0
@@ -159,7 +159,8 @@ class ModelPlainAug(ModelBase):
         # self.A_lossfn = augmentor_loss
 
         # perceptual loss for augmentor
-        self.F_lossfn = PerceptualLoss(feature_layer=7).to(self.device)
+        # self.F_loss8 = PerceptualLoss(feature_layer=8).to(self.device)
+        # self.F_loss35 = PerceptualLoss(feature_layer=35).to(self.device)
 
         # augmentor's discriminator loss
         # self.AD_lossfn = GANLoss(self.opt_train['gan_type'], 1.0, 0.0).to(self.device)
@@ -259,9 +260,9 @@ class ModelPlainAug(ModelBase):
 
 
         # update hard_ratio
-        epoch_to_update = 25
+        epoch_to_update = 10
         if (current_step - 1) % ((800 / self.batch_size) * epoch_to_update) == 0:  # 200 steps is 1 epoch for div2k train and batch size of 4
-            self.hard_ratio *= 2
+            self.hard_ratio += 1
             print(f'increased hard ratio to {self.hard_ratio}')
 
         self.A_optimizer.zero_grad()
@@ -278,11 +279,11 @@ class ModelPlainAug(ModelBase):
         # AD_loss_aug = 0.5 * self.AD_lossfn(pred_fake, True)
 
         # Perceptual loss
-        F_loss = self.F_lossfn(self.L_A, self.L)
+        # F_loss = self.F_lossfn(self.L_A, self.L)
 
         # augmentor loss
-        A_loss = F_loss
-        # A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + F_loss
+        # A_loss = F_loss
+        A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E))
         # A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss_aug
         # A_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + F_loss
         # A_loss = torch.exp(-(loss_E_A - loss_E))  # extreme loss
@@ -327,31 +328,31 @@ class ModelPlainAug(ModelBase):
         # clip_grad
         # ------------------------------------
         # `clip_grad_norm` helps prevent the exploding gradient problem.
-        G_optimizer_clipgrad = self.opt_train['G_optimizer_clipgrad'] if self.opt_train['G_optimizer_clipgrad'] else 0
-        if G_optimizer_clipgrad > 0:
-            torch.nn.utils.clip_grad_norm_(self.parameters(), max_norm=self.opt_train['G_optimizer_clipgrad'], norm_type=2)
+        # G_optimizer_clipgrad = self.opt_train['G_optimizer_clipgrad'] if self.opt_train['G_optimizer_clipgrad'] else 0
+        # if G_optimizer_clipgrad > 0:
+        #     torch.nn.utils.clip_grad_norm_(self.parameters(), max_norm=self.opt_train['G_optimizer_clipgrad'], norm_type=2)
 
         self.G_optimizer.step()
 
         # ------------------------------------
         # regularizer
         # ------------------------------------
-        G_regularizer_orthstep = self.opt_train['G_regularizer_orthstep'] if self.opt_train['G_regularizer_orthstep'] else 0
-        if G_regularizer_orthstep > 0 and current_step % G_regularizer_orthstep == 0 and current_step % self.opt['train']['checkpoint_save'] != 0:
-            self.netG.apply(regularizer_orth)
-        G_regularizer_clipstep = self.opt_train['G_regularizer_clipstep'] if self.opt_train['G_regularizer_clipstep'] else 0
-        if G_regularizer_clipstep > 0 and current_step % G_regularizer_clipstep == 0 and current_step % self.opt['train']['checkpoint_save'] != 0:
-            self.netG.apply(regularizer_clip)
+        # G_regularizer_orthstep = self.opt_train['G_regularizer_orthstep'] if self.opt_train['G_regularizer_orthstep'] else 0
+        # if G_regularizer_orthstep > 0 and current_step % G_regularizer_orthstep == 0 and current_step % self.opt['train']['checkpoint_save'] != 0:
+        #     self.netG.apply(regularizer_orth)
+        # G_regularizer_clipstep = self.opt_train['G_regularizer_clipstep'] if self.opt_train['G_regularizer_clipstep'] else 0
+        # if G_regularizer_clipstep > 0 and current_step % G_regularizer_clipstep == 0 and current_step % self.opt['train']['checkpoint_save'] != 0:
+        #     self.netG.apply(regularizer_clip)
 
         # self.log_dict['G_loss'] = G_loss.item()/self.E.size()[0]  # if `reduction='sum'`
         self.log_dict['G_loss'] = G_loss.item()
         self.log_dict['A_loss'] = A_loss.item()
-        self.log_dict['F_loss'] = F_loss.item()
+        #self.log_dict['F_loss'] = F_loss.item()
         # self.log_dict['AD_loss'] = AD_loss.item()
 
         self.log_dict['G_loss_epoch'] += G_loss.item()
         self.log_dict['A_loss_epoch'] += A_loss.item()
-        self.log_dict['F_loss_epoch'] += F_loss.item()
+        #self.log_dict['F_loss_epoch'] += F_loss.item()
         # self.log_dict['AD_loss_epoch'] += AD_loss.item()
         # self.log_dict['AD_loss_aug'] += AD_loss_aug.item()
         # self.log_dict['l_d_real'] += l_d_real.item()
