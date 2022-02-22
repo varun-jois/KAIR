@@ -24,8 +24,7 @@ def compare_augmentor_models(device, model_name):
     # image paths
     paths = util.get_image_paths('/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR_randSample')
     # hr_steps = {1: 40000, 4: 65000, 16: 68000, 64: 72000, 256: 76000, 1024: 80000, 4096: 84000, 16384: 88000}
-    hr_steps = {'20ep_hr2': 4_000, '40ep_hr4': 8_000, '60ep_hr6': 12_000, '80ep_hr8': 16_000, '100ep_hr10': 20_000,
-                '120ep_hr12': 24_000, '140ep_hr14': 28_000, '160ep_hr16': 32_000}
+    hr_steps = {'10ep_hr1': 800, '20ep_hr1': 1600, '30ep_hr1': 2400, '40ep_hr1': 3200, '50ep_hr1': 4_000}
     dir = '/home/varun/sr/KAIR/aug_images'
     model_dir = f'/home/varun/sr/KAIR/superresolution/{model_name}/models'
 
@@ -36,7 +35,7 @@ def compare_augmentor_models(device, model_name):
 
         # load the augmentor
         model_name = f'{step}_A.pth'
-        aug = RRDBNET_AUG()
+        aug = RRDBNET_AUG(nb3=3)
         aug = aug.to(device)
         state_dict = torch.load(os.path.join(model_dir, model_name))
         aug.load_state_dict(state_dict)
