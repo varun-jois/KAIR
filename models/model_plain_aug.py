@@ -273,19 +273,19 @@ class ModelPlainAug(ModelBase):
         self.E_A = self.netG(self.L_A)
 
         # calculate individual losses
-        # loss_E = self.G_lossfn(self.E, self.H)
-        # loss_E_A = self.G_lossfn(self.E_A, self.H)
+        loss_E = self.G_lossfn(self.E, self.H)
+        loss_E_A = self.G_lossfn(self.E_A, self.H)
 
         # get the loss from the discriminator
         # pred_fake = self.netAD(self.L_A)
         # AD_loss_aug = 0.5 * self.AD_lossfn(pred_fake, True)
 
         # Perceptual loss
-        F_loss = self.F_lossfn(self.L_A, self.L)
+        # F_loss = self.F_lossfn(self.L_A, self.L)
 
         # augmentor loss
-        A_loss = F_loss
-        # A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E))
+        # A_loss = F_loss
+        A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E))
         # A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss_aug
         # A_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + F_loss
         # A_loss = torch.exp(-(loss_E_A - loss_E))  # extreme loss
@@ -321,7 +321,11 @@ class ModelPlainAug(ModelBase):
 
         self.G_optimizer.zero_grad()
         G_loss = self.G_lossfn(self.netG(self.L), self.H) + self.G_lossfn(self.netG(self.L_A.detach()), self.H)
-        G_loss = G_loss / 2
+        # if current_step % 2 == 0:
+        #     G_loss = self.G_lossfn(self.netG(self.L_A.detach()), self.H)
+        # else:
+        #     G_loss = self.G_lossfn(self.netG(self.L), self.H)
+        # G_loss = G_loss
         G_loss.backward()
         # print(f'A after G back, should be unchanged: {self.netA.module.conv_last.weight[0][0][0].grad}')
         # print(f'G after G back, should be changed: {self.netG.module.conv_last.weight[0][0][0].grad}')
