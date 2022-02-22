@@ -60,7 +60,7 @@ class ModelPlainAug(ModelBase):
         self.log_dict['G_loss_epoch'] = 0
         self.log_dict['A_loss_epoch'] = 0
         self.log_dict['G_loss_epoch'] = 0
-        # self.log_dict['F_loss_epoch'] = 0
+        self.log_dict['F_loss_epoch'] = 0
         # self.log_dict['AD_loss_epoch'] = 0
         # self.log_dict['AD_loss_aug'] = 0
         # self.log_dict['l_d_real'] = 0
@@ -159,8 +159,7 @@ class ModelPlainAug(ModelBase):
         # self.A_lossfn = augmentor_loss
 
         # perceptual loss for augmentor
-        # self.F_loss8 = PerceptualLoss(feature_layer=8).to(self.device)
-        # self.F_loss35 = PerceptualLoss(feature_layer=35).to(self.device)
+        self.F_lossfn = PerceptualLoss(feature_layer=[8, 35], weights=[1, 0], use_input_norm=False).to(self.device)
 
         # augmentor's discriminator loss
         # self.AD_lossfn = GANLoss(self.opt_train['gan_type'], 1.0, 0.0).to(self.device)
@@ -262,8 +261,11 @@ class ModelPlainAug(ModelBase):
         # update hard_ratio
         epoch_to_update = 10
         if (current_step - 1) % ((800 / self.batch_size) * epoch_to_update) == 0:  # 200 steps is 1 epoch for div2k train and batch size of 4
-            self.hard_ratio += 1
-            print(f'increased hard ratio to {self.hard_ratio}')
+            # self.hard_ratio += 1
+            if current_step != 1:
+                self.F_lossfn.weights[0] -= 0.05
+                self.F_lossfn.weights[1] += 0.05
+                print(f'Weights are {self.F_lossfn.weights}')
 
         self.A_optimizer.zero_grad()
         self.L_A = self.netA(self.H)
@@ -271,19 +273,19 @@ class ModelPlainAug(ModelBase):
         self.E_A = self.netG(self.L_A)
 
         # calculate individual losses
-        loss_E = self.G_lossfn(self.E, self.H)
-        loss_E_A = self.G_lossfn(self.E_A, self.H)
+        # loss_E = self.G_lossfn(self.E, self.H)
+        # loss_E_A = self.G_lossfn(self.E_A, self.H)
 
         # get the loss from the discriminator
         # pred_fake = self.netAD(self.L_A)
         # AD_loss_aug = 0.5 * self.AD_lossfn(pred_fake, True)
 
         # Perceptual loss
-        # F_loss = self.F_lossfn(self.L_A, self.L)
+        F_loss = self.F_lossfn(self.L_A, self.L)
 
         # augmentor loss
-        # A_loss = F_loss
-        A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E))
+        A_loss = F_loss
+        # A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E))
         # A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss_aug
         # A_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + F_loss
         # A_loss = torch.exp(-(loss_E_A - loss_E))  # extreme loss
@@ -347,12 +349,12 @@ class ModelPlainAug(ModelBase):
         # self.log_dict['G_loss'] = G_loss.item()/self.E.size()[0]  # if `reduction='sum'`
         self.log_dict['G_loss'] = G_loss.item()
         self.log_dict['A_loss'] = A_loss.item()
-        #self.log_dict['F_loss'] = F_loss.item()
+        self.log_dict['F_loss'] = F_loss.item()
         # self.log_dict['AD_loss'] = AD_loss.item()
 
         self.log_dict['G_loss_epoch'] += G_loss.item()
         self.log_dict['A_loss_epoch'] += A_loss.item()
-        #self.log_dict['F_loss_epoch'] += F_loss.item()
+        self.log_dict['F_loss_epoch'] += F_loss.item()
         # self.log_dict['AD_loss_epoch'] += AD_loss.item()
         # self.log_dict['AD_loss_aug'] += AD_loss_aug.item()
         # self.log_dict['l_d_real'] += l_d_real.item()
