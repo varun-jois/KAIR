@@ -159,7 +159,7 @@ class ModelPlainAug(ModelBase):
         # self.A_lossfn = augmentor_loss
 
         # perceptual loss for augmentor
-        self.F_lossfn = PerceptualLoss(feature_layer=34).to(self.device)
+        self.F_lossfn = PerceptualLoss(feature_layer=7).to(self.device)
 
         # augmentor's discriminator loss
         # self.AD_lossfn = GANLoss(self.opt_train['gan_type'], 1.0, 0.0).to(self.device)
