@@ -260,9 +260,9 @@ class ModelPlainAug(ModelBase):
 
 
         # update hard_ratio
-        # epoch_to_update = 10
-        # if (current_step - 1) % ((800 / self.batch_size) * epoch_to_update) == 0:  # 200 steps is 1 epoch for div2k train and batch size of 4
-        #     # self.hard_ratio += 1
+        epoch_to_update = 100
+        if (current_step - 1) % ((800 / self.batch_size) * epoch_to_update) == 0:  # 200 steps is 1 epoch for div2k train and batch size of 4
+            self.hard_ratio += 1
         #     self.F_lossfn.weights[0] -= 0.05
         #     self.F_lossfn.weights[1] += 0.05
         #     print(f'Weights are {self.F_lossfn.weights}')
