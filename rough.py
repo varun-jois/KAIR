@@ -48,3 +48,5 @@ print(f'L1 loss with ones {np.abs(np.ones(h.shape) - h).mean()}')
 
 pl = PerceptualLoss(feature_layer=34).to('cuda')
 loss = pl(noise, h)
+
+loss1(.03, 1)
