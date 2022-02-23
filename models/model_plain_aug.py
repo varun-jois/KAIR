@@ -160,7 +160,7 @@ class ModelPlainAug(ModelBase):
 
         # perceptual loss for augmentor
         # self.F_lossfn = PerceptualLoss(feature_layer=[8, 35], weights=[1.05, -0.05], use_input_norm=False).to(self.device)
-        # self.F_lossfn = PerceptualLoss(feature_layer=8, use_input_norm=False).to(self.device)
+        self.F_lossfn = PerceptualLoss(feature_layer=35, use_input_norm=False).to(self.device)
 
         # augmentor's discriminator loss
         # self.AD_lossfn = GANLoss(self.opt_train['gan_type'], 1.0, 0.0).to(self.device)
@@ -281,13 +281,13 @@ class ModelPlainAug(ModelBase):
         # AD_loss_aug = 0.5 * self.AD_lossfn(pred_fake, True)
 
         # Perceptual loss
-        # F_loss = self.F_lossfn(self.L_A, self.L)
+        F_loss = self.F_lossfn(self.L_A, self.L)
 
         # augmentor loss
         # A_loss = F_loss
-        A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E))
+        # A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E))
         # A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss_aug
-        # A_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + F_loss
+        A_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + F_loss / 2
         # A_loss = torch.exp(-(loss_E_A - loss_E))  # extreme loss
         A_loss.backward(retain_graph=True)
         self.A_optimizer.step()
