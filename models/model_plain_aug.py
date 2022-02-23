@@ -160,7 +160,7 @@ class ModelPlainAug(ModelBase):
 
         # perceptual loss for augmentor
         # self.F_lossfn = PerceptualLoss(feature_layer=[8, 35], weights=[1.05, -0.05], use_input_norm=False).to(self.device)
-        self.F_lossfn = PerceptualLoss(feature_layer=8, use_input_norm=False).to(self.device)
+        # self.F_lossfn = PerceptualLoss(feature_layer=8, use_input_norm=False).to(self.device)
 
         # augmentor's discriminator loss
         # self.AD_lossfn = GANLoss(self.opt_train['gan_type'], 1.0, 0.0).to(self.device)
@@ -260,7 +260,7 @@ class ModelPlainAug(ModelBase):
 
 
         # update hard_ratio
-        epoch_to_update = 100
+        epoch_to_update = 50
         if (current_step - 1) % ((800 / self.batch_size) * epoch_to_update) == 0:  # 200 steps is 1 epoch for div2k train and batch size of 4
             self.hard_ratio += 1
         #     self.F_lossfn.weights[0] -= 0.05
