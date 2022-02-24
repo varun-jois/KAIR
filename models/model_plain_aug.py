@@ -60,13 +60,9 @@ class ModelPlainAug(ModelBase):
         self.log_dict['G_loss_epoch'] = 0
         self.log_dict['A_loss_epoch'] = 0
         self.log_dict['G_loss_epoch'] = 0
-        self.log_dict['L1_L'] = 0
-        self.log_dict['L1_LA'] = 0
+        # self.log_dict['L1_L'] = 0
+        # self.log_dict['L1_LA'] = 0
         # self.log_dict['F_loss_epoch'] = 0
-        # self.log_dict['AD_loss_epoch'] = 0
-        # self.log_dict['AD_loss_aug'] = 0
-        # self.log_dict['l_d_real'] = 0
-        # self.log_dict['l_d_fake'] = 0
 
     # ----------------------------------------
     # load pre-trained G model
@@ -150,15 +146,6 @@ class ModelPlainAug(ModelBase):
         else:
             raise NotImplementedError('Loss type [{:s}] is not found.'.format(G_lossfn_type))
         self.G_lossfn_weight = self.opt_train['G_lossfn_weight']
-
-        # augmentor loss
-        # def augmentor_loss(E, E_A, H):
-        #     loss_E = self.G_lossfn(E, H)
-        #     loss_E_A = self.G_lossfn(E_A, H)
-        #     aug_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E))
-        #     loss = loss_E_A + self.augmentation_wt * aug_loss
-        #     return loss
-        # self.A_lossfn = augmentor_loss
 
         # perceptual loss for augmentor
         # self.F_lossfn = PerceptualLoss(feature_layer=[8, 35], weights=[1.05, -0.05], use_input_norm=False).to(self.device)
@@ -264,11 +251,8 @@ class ModelPlainAug(ModelBase):
         # update hard_ratio
         epoch_to_update = 50
         if (current_step - 1) % ((800 / self.batch_size) * epoch_to_update) == 0:  # 200 steps is 1 epoch for div2k train and batch size of 4
-            self.hard_ratio += 0.05
+            self.hard_ratio += 1
             print(f'Increased hard ratio to {self.hard_ratio}')
-        #     self.F_lossfn.weights[0] -= 0.05
-        #     self.F_lossfn.weights[1] += 0.05
-        #     print(f'Weights are {self.F_lossfn.weights}')
 
         self.A_optimizer.zero_grad()
         self.L_A = self.netA(self.H)
@@ -287,11 +271,9 @@ class ModelPlainAug(ModelBase):
         # F_loss = self.F_lossfn(self.L_A, self.L)
 
         # augmentor loss
-        # A_loss = F_loss
         A_loss = loss_E_A + 2 * torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E))
         # A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss_aug
         # A_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + F_loss / 10
-        # A_loss = torch.exp(-(loss_E_A - loss_E))  # extreme loss
         A_loss.backward(retain_graph=True)
         self.A_optimizer.step()
 
@@ -324,11 +306,6 @@ class ModelPlainAug(ModelBase):
 
         self.G_optimizer.zero_grad()
         G_loss = self.G_lossfn(self.netG(self.L), self.H) + self.G_lossfn(self.netG(self.L_A.detach()), self.H)
-        # if current_step % 2 == 0:
-        #     G_loss = self.G_lossfn(self.netG(self.L_A.detach()), self.H)
-        # else:
-        #     G_loss = self.G_lossfn(self.netG(self.L), self.H)
-        # G_loss = G_loss
         G_loss.backward()
         # print(f'A after G back, should be unchanged: {self.netA.module.conv_last.weight[0][0][0].grad}')
         # print(f'G after G back, should be changed: {self.netG.module.conv_last.weight[0][0][0].grad}')
@@ -364,10 +341,6 @@ class ModelPlainAug(ModelBase):
         self.log_dict['L1_L'] += loss_E.item()
         self.log_dict['L1_LA'] += loss_E_A.item()
         # self.log_dict['F_loss_epoch'] += F_loss.item()
-        # self.log_dict['AD_loss_epoch'] += AD_loss.item()
-        # self.log_dict['AD_loss_aug'] += AD_loss_aug.item()
-        # self.log_dict['l_d_real'] += l_d_real.item()
-        # self.log_dict['l_d_fake'] += l_d_fake.item()
 
         self.log_dict['hard_ratio'] = self.hard_ratio
 
