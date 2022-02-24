@@ -1,7 +1,7 @@
 {
-  "task": "aug_x4_rrdb_p"     //  root/task/images|models|options     aug_x4_model or baseline_x4_model
+  "task": "aug_x4_rrdb"     //  root/task/images|models|options     aug_x4_model or baseline_x4_model
   , "model": "plain_aug"           // "plain" | "plain2" if two inputs
-  , "gpu_ids": [2]             // [0,1,2,3] for 4 GPUs
+  , "gpu_ids": [1]             // [0,1,2,3] for 4 GPUs
   , "dist": true
 
   , "scale": 4       // broadcast to "datasets"
@@ -100,7 +100,7 @@
     , "G_optimizer_type": "adam"        // fixed, adam is enough
     , "G_optimizer_lr": 1e-4            // learning rate
     , "A_optimizer_type": "adam"        // fixed, adam is enough
-    , "A_optimizer_lr": 1e-5            // learning rate
+    , "A_optimizer_lr": 1e-4            // learning rate
     , "G_optimizer_clipgrad": null      // unused
     , "G_optimizer_reuse": true
     , "A_optimizer_reuse": true
@@ -131,7 +131,7 @@
     , "checkpoint_test": 500000000000           // skip testing  they used 5000
     , "checkpoint_save": 4000           // for saving model 1000 is 5 epochs if batch size is 4
     , "checkpoint_print": 20000000000           // for print they used 200
-    , "hard_ratio_start": 0             // The starting value of the hard ratio UNUSED
+    , "hard_ratio_start": 4             // The starting value of the hard ratio UNUSED
     , "hard_ratio_end": 20              // The final value of the hard ratio
     , "manual_seed": 1
   }
