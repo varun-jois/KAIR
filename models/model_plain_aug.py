@@ -348,7 +348,7 @@ class ModelPlainAug(ModelBase):
         if self.opt_train['E_decay'] > 0:
             self.update_E(self.opt_train['E_decay'])
 
-        gc.collect()
+        torch.cuda.empty_cache()
 
     # ----------------------------------------
     # test / inference
