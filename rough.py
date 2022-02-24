@@ -4,6 +4,10 @@ import numpy as np
 import torch
 from models.loss import PerceptualLoss
 
+######################
+# For GPU
+######################
+
 # read an image
 h = iio.imread('/home/varun/sr/datasets/practice/0813_44.png')
 h = np.asarray(h)
@@ -26,3 +30,27 @@ pl = PerceptualLoss(feature_layer=35).to('cuda')
 print(f'Perceptual loss with psnr 44 : {pl(b, h).item()}')
 print(f'L1 loss with zeros {np.abs(np.zeros(h.shape) - h).mean()}')
 print(f'L1 loss with ones {np.abs(np.ones(h.shape) - h).mean()}')
+
+######################
+# For my laptop
+######################
+
+# read H
+h = iio.imread('/home/varun/PhD/super_resolution/datasets/DIV2K_valid_HR_randSample/0813.png')
+h = np.asarray(h)
+h = h / 255
+
+# read E
+e = iio.imread('/home/varun/PhD/super_resolution/KAIR/experiments/exp_30/50ep_hr1/0813_50ep_hr1_26.2_E.png')
+e = np.asarray(e)
+e = e / 255
+
+# read e_a
+e_a = iio.imread('/home/varun/PhD/super_resolution/KAIR/experiments/exp_30/50ep_hr1/0813_50ep_hr1_25.82_E_A.png')
+e_a = np.asarray(e_a)
+e_a = e_a / 255
+
+print(f'L1 loss with e {np.abs(e - h).mean()}')
+print(f'L1 loss with e_a {np.abs(e_a - h).mean()}')
+
+
