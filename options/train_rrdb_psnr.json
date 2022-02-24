@@ -1,7 +1,7 @@
 {
   "task": "baseline_x4_rrdb"     //  root/task/images-models-options
   , "model": "plain" // "plain" | "plain2" if two inputs
-  , "gpu_ids": [1]
+  , "gpu_ids": [1,2]
 
   , "scale": 4       // broadcast to "netG" if SISR
   , "n_channels": 3  // broadcast to "datasets", 1 for grayscale, 3 for color
@@ -25,7 +25,7 @@
       , "H_size": 192                    // patch size 40 | 64 | 96 | 128 | 192
       , "dataloader_shuffle": true
       , "dataloader_num_workers": 8
-      , "dataloader_batch_size": 16     // batch size 1 | 16 | 32 | 48 | 64 | 128
+      , "dataloader_batch_size": 32     // batch size 1 | 16 | 32 | 48 | 64 | 128
     }
     , "test": {
       "name": "test_dataset"            // just name
@@ -68,7 +68,7 @@
     , "G_regularizer_clipstep": null    // unused
 
     , "checkpoint_test": 5000000           // for testing
-    , "checkpoint_save": 2500           // for saving model
+    , "checkpoint_save": 500           // for saving model
     , "checkpoint_print": 5000000           // for print
   }
 }
