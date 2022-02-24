@@ -338,8 +338,8 @@ class ModelPlainAug(ModelBase):
 
         self.log_dict['G_loss_epoch'] += G_loss.item()
         self.log_dict['A_loss_epoch'] += A_loss.item()
-        self.log_dict['L1_L'] += loss_E.item()
-        self.log_dict['L1_LA'] += loss_E_A.item()
+        # self.log_dict['L1_L'] += loss_E.item()
+        # self.log_dict['L1_LA'] += loss_E_A.item()
         # self.log_dict['F_loss_epoch'] += F_loss.item()
 
         self.log_dict['hard_ratio'] = self.hard_ratio
