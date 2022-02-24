@@ -3,6 +3,8 @@ import imageio as iio
 import numpy as np
 import torch
 from models.loss import PerceptualLoss
+from torchvision.transforms.functional import center_crop
+from torchvision.utils import save_image
 
 ######################
 # For GPU
@@ -27,15 +29,15 @@ l = torch.from_numpy(l).permute(2, 0, 1).unsqueeze(0).to('cuda')
 hr = iio.imread('/home/varun/sr/datasets/practice/0813.png')
 hr = np.asarray(hr)
 hr = hr / 255
-_, hr = hr[:, :(hr.shape[1] // 2)], hr[:, (hr.shape[1] // 2):]
 hr = torch.from_numpy(hr).permute(2, 0, 1).unsqueeze(0).to('cuda')
+crop = center_crop(hr, h.size()[-2:])
 
 
 # load perceptual loss
 pl = PerceptualLoss(feature_layer=35).to('cuda')
 
 # L1 loss
-print(f'Perceptual loss with psnr 44 : {pl(b, h).item()}')
+print(f'Perceptual loss with psnr 44 : {pl(b.float(), crop.float()).item()}')
 print(f'L1 loss with zeros {np.abs(np.zeros(h.shape) - h).mean()}')
 print(f'L1 loss with ones {np.abs(np.ones(h.shape) - h).mean()}')
 
@@ -52,7 +54,10 @@ h = h / 255
 e = iio.imread('/home/varun/PhD/super_resolution/KAIR/experiments/exp_30/20ep_hr1/0813_20ep_hr1_34.26.png')
 e = np.asarray(e)
 e = e / 255
+e = torch.from_numpy(e).permute(2, 0, 1).unsqueeze(0)
 
+# find centre
+height
 
 print(f'L1 loss with e {np.abs(e - h).mean()}')
 print(f'L1 loss with e_a {np.abs(e_a - h).mean()}')
