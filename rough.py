@@ -5,6 +5,14 @@ import torch
 from models.loss import PerceptualLoss
 from torchvision.transforms.functional import center_crop
 from torchvision.utils import save_image
+from models import model_plain_aug
+from models.network_rrdbnet_augmentor import RRDBNET_AUG
+from models.network_rrdbnet import RRDBNet
+
+import os
+os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
+os.environ["CUDA_VISIBLE_DEVICES"]="1"
+
 
 ######################
 # For GPU
@@ -30,8 +38,20 @@ hr = iio.imread('/home/varun/sr/datasets/practice/0813.png')
 hr = np.asarray(hr)
 hr = hr / 255
 hr = torch.from_numpy(hr).permute(2, 0, 1).unsqueeze(0).to('cuda')
-crop = center_crop(hr, h.size()[-2:])
 
+# load models
+aug = RRDBNET_AUG()
+aug = aug.to('cuda')
+state_dict = torch.load('/home/varun/sr/KAIR/superresolution/aug_x4_rrdb/models/20000_A.pth')
+aug.load_state_dict(state_dict)
+
+# load the generator
+gen = RRDBNet()
+gen = gen.to('cuda')
+state_dict = torch.load('/home/varun/sr/KAIR/superresolution/aug_x4_rrdb/models/20000_G.pth')
+gen.load_state_dict(state_dict)
+
+l_a = aug(hr)
 
 # load perceptual loss
 pl = PerceptualLoss(feature_layer=35).to('cuda')
