@@ -196,12 +196,6 @@ class ModelPlainAug(ModelBase):
     def optimize_parameters(self, current_step):
         # torch.autograd.set_detect_anomaly(True)
 
-        # update hard_ratio
-        epoch_to_update = 50
-        if (current_step - 1) % ((800 / self.batch_size) * epoch_to_update) == 0:  # 200 steps is 1 epoch for div2k train and batch size of 4
-            self.hard_ratio += 0.05
-            print(f'Increased hard ratio to {self.hard_ratio}')
-
         self.A_optimizer.zero_grad()
         self.L_A = self.netA(self.H)
         self.E = self.netG(self.L)
@@ -340,5 +334,9 @@ class ModelPlainAug(ModelBase):
         msg = self.describe_params(self.netG)
         return msg
 
-    def update_hard_ratio(self):
-        self.hard_ratio += 1
+    def update_hard_ratio(self, epoch):
+        epoch_to_update = 50
+        if epoch > 0 and (epoch % epoch_to_update == 0):  # 200 steps is 1 epoch for div2k train and batch size of 4
+            self.hard_ratio += 0.05
+            print(f'Increased hard ratio to {self.hard_ratio}')
+

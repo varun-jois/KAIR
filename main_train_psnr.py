@@ -216,6 +216,9 @@ def main(json_path='options/train_msrresnet_psnr.json'):
                 logger.info('Saving the model.')
                 model.save(current_step)
 
+            if opt['task'][:3] == 'aug':
+                model.update_hard_ratio(epoch)
+
             # -------------------------------
             # 6) testing
             # -------------------------------
@@ -282,7 +285,7 @@ def main(json_path='options/train_msrresnet_psnr.json'):
         message = f'{epoch} '
         message += ' '.join([f'{k:s}:{v / s:.3e}' for k, v in epoch_stats.items() if k != 'hard_ratio'])
         if 'hard_ratio' in epoch_stats:
-            message += f" hard_ratio:{epoch_stats['hard_ratio']:.3e}"
+            message += f" hard_ratio:{epoch_stats['hard_ratio']}"
         logger.info(message)
 
 
