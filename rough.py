@@ -23,6 +23,14 @@ l = l / 255
 _, l = l[:, :(l.shape[1] // 2)], l[:, (l.shape[1] // 2):]
 l = torch.from_numpy(l).permute(2, 0, 1).unsqueeze(0).to('cuda')
 
+# read hr image
+hr = iio.imread('/home/varun/sr/datasets/practice/0813.png')
+hr = np.asarray(hr)
+hr = hr / 255
+_, hr = hr[:, :(hr.shape[1] // 2)], hr[:, (hr.shape[1] // 2):]
+hr = torch.from_numpy(hr).permute(2, 0, 1).unsqueeze(0).to('cuda')
+
+
 # load perceptual loss
 pl = PerceptualLoss(feature_layer=35).to('cuda')
 
@@ -40,15 +48,11 @@ h = iio.imread('/home/varun/PhD/super_resolution/datasets/DIV2K_valid_HR_randSam
 h = np.asarray(h)
 h = h / 255
 
-# read E
-e = iio.imread('/home/varun/PhD/super_resolution/KAIR/experiments/exp_30/50ep_hr1/0813_50ep_hr1_26.2_E.png')
+# read small
+e = iio.imread('/home/varun/PhD/super_resolution/KAIR/experiments/exp_30/20ep_hr1/0813_20ep_hr1_34.26.png')
 e = np.asarray(e)
 e = e / 255
 
-# read e_a
-e_a = iio.imread('/home/varun/PhD/super_resolution/KAIR/experiments/exp_30/50ep_hr1/0813_50ep_hr1_25.82_E_A.png')
-e_a = np.asarray(e_a)
-e_a = e_a / 255
 
 print(f'L1 loss with e {np.abs(e - h).mean()}')
 print(f'L1 loss with e_a {np.abs(e_a - h).mean()}')
