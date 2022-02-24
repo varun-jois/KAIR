@@ -129,7 +129,7 @@
 
 
     , "checkpoint_test": 500000000000           // skip testing  they used 5000
-    , "checkpoint_save": 2500           // for saving model 1000 is 5 epochs if batch size is 4
+    , "checkpoint_save": 1000           // for saving model 1000 is 5 epochs if batch size is 4
     , "checkpoint_print": 20000000000           // for print they used 200
     , "hard_ratio_start": 0             // The starting value of the hard ratio UNUSED
     , "hard_ratio_end": 20              // The final value of the hard ratio

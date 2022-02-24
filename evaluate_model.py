@@ -46,10 +46,10 @@ def main(model_names):
             gen = RRDBNet()
         gen = gen.to(device)
         # try to get the E model other wise G
-        _, init_path = option.find_last_checkpoint(os.path.join(MODEL_DIR, m, 'models'), net_type='E')
-        if init_path is None:
-            _, init_path = option.find_last_checkpoint(os.path.join(MODEL_DIR, m, 'models'), net_type='G')
-            print('Loaded the G model')
+        # _, init_path = option.find_last_checkpoint(os.path.join(MODEL_DIR, m, 'models'), net_type='E')
+        # if init_path is None:
+        _, init_path = option.find_last_checkpoint(os.path.join(MODEL_DIR, m, 'models'), net_type='G')
+        print('Loaded the G model')
         gen.load_state_dict(torch.load(init_path), strict=True)
         gen.eval()
 
