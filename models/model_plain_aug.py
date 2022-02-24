@@ -191,12 +191,6 @@ class ModelPlainAug(ModelBase):
         self.E = self.netG(self.L)
 
     # ----------------------------------------
-    # feed L to netA
-    # ----------------------------------------
-    def netA_forward(self):
-        self.L_A = self.netA(self.H)
-
-    # ----------------------------------------
     # update parameters and get loss
     # ----------------------------------------
     def optimize_parameters(self, current_step):
@@ -235,7 +229,6 @@ class ModelPlainAug(ModelBase):
 
         self.log_dict['G_loss'] = G_loss.item()
         self.log_dict['A_loss'] = A_loss.item()
-
 
         self.log_dict['G_loss_epoch'] += G_loss.item()
         self.log_dict['A_loss_epoch'] += A_loss.item()
