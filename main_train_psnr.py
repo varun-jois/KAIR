@@ -286,7 +286,7 @@ def main(json_path='options/train_msrresnet_psnr.json'):
         logger.info(message)
 
         # save the model
-        epoch_to_save = 1
+        epoch_to_save = 25
         if epoch > start and (epoch % epoch_to_save == 0):
             logger.info('Saving the model.')
             model.save(epoch)
