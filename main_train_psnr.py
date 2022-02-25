@@ -177,8 +177,8 @@ def main(json_path='options/train_msrresnet_psnr.json'):
     # Step--4 (main training)
     # ----------------------------------------
     '''
-
-    for epoch in range(150, 200):  # keep running
+    start, end = 150, 200
+    for epoch in range(start, end):  # keep running
         for i, train_data in enumerate(train_loader):
 
             current_step += 1
@@ -287,14 +287,14 @@ def main(json_path='options/train_msrresnet_psnr.json'):
 
         # save the model
         epoch_to_save = 1
-        if epoch > 0 and (epoch % epoch_to_save == 0):
+        if epoch > start and (epoch % epoch_to_save == 0):
             logger.info('Saving the model.')
             model.save(epoch)
 
         # increase hard ratio
         if opt['task'][:3] == 'aug':
             epoch_to_update = 500000
-            if epoch > 0 and (epoch % epoch_to_update == 0):
+            if epoch > start and (epoch % epoch_to_update == 0):
                 model.update_hard_ratio()
 
 
