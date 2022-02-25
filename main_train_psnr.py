@@ -178,7 +178,7 @@ def main(json_path='options/train_msrresnet_psnr.json'):
     # ----------------------------------------
     '''
 
-    for epoch in range(200):  # keep running
+    for epoch in range(150, 200):  # keep running
         for i, train_data in enumerate(train_loader):
 
             current_step += 1
@@ -286,7 +286,7 @@ def main(json_path='options/train_msrresnet_psnr.json'):
         logger.info(message)
 
         # save the model
-        epoch_to_save = 25
+        epoch_to_save = 1
         if epoch > 0 and (epoch % epoch_to_save == 0):
             logger.info('Saving the model.')
             model.save(epoch)
