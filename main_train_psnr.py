@@ -212,9 +212,9 @@ def main(json_path='options/train_msrresnet_psnr.json'):
             # -------------------------------
             # 5) save model
             # -------------------------------
-            if current_step % opt['train']['checkpoint_save'] == 0 and opt['rank'] == 0:
-                logger.info('Saving the model.')
-                model.save(current_step)
+            # if current_step % opt['train']['checkpoint_save'] == 0 and opt['rank'] == 0:
+            #     logger.info('Saving the model.')
+            #     model.save(current_step)
 
             # -------------------------------
             # 6) testing
@@ -285,9 +285,15 @@ def main(json_path='options/train_msrresnet_psnr.json'):
             message += f" hard_ratio:{epoch_stats['hard_ratio']}"
         logger.info(message)
 
+        # save the model
+        epoch_to_save = 25
+        if epoch > 0 and (epoch % epoch_to_save == 0):
+            logger.info('Saving the model.')
+            model.save(epoch)
+
         # increase hard ratio
         if opt['task'][:3] == 'aug':
-            epoch_to_update = 50
+            epoch_to_update = 500000
             if epoch > 0 and (epoch % epoch_to_update == 0):
                 model.update_hard_ratio()
 
