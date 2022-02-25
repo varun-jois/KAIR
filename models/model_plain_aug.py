@@ -133,7 +133,7 @@ class ModelPlainAug(ModelBase):
 
         # perceptual loss for augmentor
         # self.F_lossfn = PerceptualLoss(feature_layer=[8, 35], weights=[1.05, -0.05], use_input_norm=False).to(self.device)
-        self.F_lossfn = PerceptualLoss(feature_layer=35, use_input_norm=False).to(self.device)
+        self.F_lossfn = PerceptualLoss(feature_layer=34, use_input_norm=False).to(self.device)
 
     # ----------------------------------------
     # define optimizer
@@ -207,10 +207,11 @@ class ModelPlainAug(ModelBase):
         loss_E_A = self.G_lossfn(self.E_A, self.H)
 
         # get perceptual loss
-        F_loss = self.F_lossfn(self.L_A, self.L)
+        F_loss = self.F_lossfn(self.L_A, self.L) / 2
 
         # augmentor loss
         A_loss = loss_E_A + 2 * torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + F_loss
+        # A_loss = loss_E_A
         # A_loss = loss_E_A + torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + AD_loss_aug
         # A_loss = torch.abs(1.0 - torch.exp(loss_E_A - self.hard_ratio * loss_E)) + F_loss / 10
         A_loss.backward(retain_graph=True)
