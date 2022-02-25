@@ -6,7 +6,7 @@ from torch.optim import Adam
 
 from models.select_network import define_G, define_A
 from models.model_base import ModelBase
-from models.loss import CharbonnierLoss
+from models.loss import CharbonnierLoss, PerceptualLoss
 from models.loss_ssim import SSIMLoss
 
 from utils.utils_model import test_mode
