@@ -334,9 +334,7 @@ class ModelPlainAug(ModelBase):
         msg = self.describe_params(self.netG)
         return msg
 
-    def update_hard_ratio(self, epoch):
-        epoch_to_update = 50
-        if epoch > 0 and (epoch % epoch_to_update == 0):  # 200 steps is 1 epoch for div2k train and batch size of 4
-            self.hard_ratio += 0.05
-            print(f'Increased hard ratio to {self.hard_ratio}')
+    def update_hard_ratio(self):
+        self.hard_ratio += 0.05
+        print(f'Increased hard ratio to {self.hard_ratio}')
 

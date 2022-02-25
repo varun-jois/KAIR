@@ -223,8 +223,8 @@ def test_augmentor(device, model_name):
 
 def test_generator(device, model_name):
     # image paths
-    #paths = util.get_image_paths('/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR_randSample')
-    paths = util.get_image_paths('/home/varun/sr/datasets/misc')
+    paths = util.get_image_paths('/home/varun/sr/datasets/DIV2K/DIV2K_valid_HR_randSample')
+    #paths = util.get_image_paths('/home/varun/sr/datasets/misc')
     dir = '/home/varun/sr/KAIR/gen_images'
     model_dir = f'/home/varun/sr/KAIR/superresolution/{model_name}/models'
 
@@ -242,7 +242,7 @@ def test_generator(device, model_name):
     print('loaded model')
 
     # the images to evaluate
-    idx = range(3)  # np.random.randint(0, 10, 5)
+    idx = range(10)  # np.random.randint(0, 10, 5)
 
     for i in idx:
         # pick a random pic
