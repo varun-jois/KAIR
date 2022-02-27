@@ -199,12 +199,12 @@ class ModelPlainAug(ModelBase):
 
         self.A_optimizer.zero_grad()
         self.L_A = self.netA(self.H)
-        # self.E = self.netG(self.L)
-        # self.E_A = self.netG(self.L_A)
-        #
-        # # calculate individual losses
-        # loss_E = self.G_lossfn(self.E, self.H)
-        # loss_E_A = self.G_lossfn(self.E_A, self.H)
+        self.E = self.netG(self.L)
+        self.E_A = self.netG(self.L_A)
+
+        # calculate individual losses
+        loss_E = self.G_lossfn(self.E, self.H)
+        loss_E_A = self.G_lossfn(self.E_A, self.H)
 
         # get perceptual loss
         F_loss = self.F_lossfn(self.L_A, self.L)
