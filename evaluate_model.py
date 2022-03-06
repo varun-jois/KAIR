@@ -28,7 +28,7 @@ from datetime import datetime
 
 TEST_DIR = '/home/varun/sr/datasets'
 MODEL_DIR = '/home/varun/sr/KAIR/superresolution'
-TESTSETS = ['Set5', 'Set14', 'B100', 'Urban100']
+TESTSETS = ['Set5', 'Set14', 'B100', 'Urban100', 'RealSR']  # ['RealSR']
 METRICS = ['psnr', 'ssim']
 
 
@@ -59,8 +59,11 @@ def main(model_names):
 
         for t in TESTSETS:
             # the paths for the images
-            L_paths = util.get_image_paths(os.path.join(TEST_DIR, t, 'LR_bicubic', sf))
-            H_path_dir = os.path.join(TEST_DIR, t, 'HR')
+            if t == 'RealSR':
+                L_paths = util.get_image_paths(f'/home/varun/sr/datasets/RealSR_V3/test/LR/{sf}')
+            else:
+                L_paths = util.get_image_paths(os.path.join(TEST_DIR, t, 'LR_bicubic', sf))
+                H_path_dir = os.path.join(TEST_DIR, t, 'HR')
 
             # counters for the metrics
             psnr_total = 0
@@ -84,7 +87,10 @@ def main(model_names):
                 img_E = util.tensor2uint(img_E)
 
                 # load the HR image
-                img_H_path = os.path.join(H_path_dir, f'{name[:-2]}.png')
+                if t == 'RealSR':
+                    img_H_path = f'/home/varun/sr/datasets/RealSR_V3/test/HR/{sf}/{name[:-3]}HR.png'
+                else:
+                    img_H_path = os.path.join(H_path_dir, f'{name[:-2]}.png')
                 img_H = util.imread_uint(img_H_path, 3)
                 img_H = util.modcrop(img_H, int(sf[-1]))
 
